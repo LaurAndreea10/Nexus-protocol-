@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NEXUS PROTOCOL — Endless runner neon cu CRM tycoon și code challenges. Single-file game by Laura Andreea.">
+<meta name="theme-color" content="#05070f">
+<meta property="og:title" content="NEXUS PROTOCOL — Neon Drift CRM">
+<meta property="og:description" content="Endless runner + CRM tycoon + code breaker. Bilingv RO/EN.">
+<meta property="og:type" content="website">
+<title>NEXUS PROTOCOL · Neon Drift CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     NEXUS PROTOCOL — Design Tokens
+     ============================================================ */
+  :root {
+    --bg-0: #05070f;
+    --bg-1: #0a0f1f;
+    --bg-2: #111835;
+    --grid: #1a2456;
+    --neon-cyan: #00f0ff;
+    --neon-magenta: #ff2bd6;
+    --neon-violet: #8a3bff;
+    --neon-yellow: #ffe600;
+    --neon-green: #39ff7e;
+    --neon-red: #ff3b6b;
+    --text-0: #f4f7ff;
+    --text-1: #aab3d9;
+    --text-2: #6b7399;
+    --glow-cyan: 0 0 12px rgba(0,240,255,.6), 0 0 32px rgba(0,240,255,.25);
+    --glow-magenta: 0 0 12px rgba(255,43,214,.6), 0 0 32px rgba(255,43,214,.25);
+    --glow-yellow: 0 0 12px rgba(255,230,0,.6), 0 0 32px rgba(255,230,0,.25);
+    --glow-green: 0 0 12px rgba(57,255,126,.55), 0 0 28px rgba(57,255,126,.22);
+    --font-display: 'Orbitron', sans-serif;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+
+  body {
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(138,59,255,.18), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,240,255,.12), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,43,214,.08), transparent 60%),
+      var(--bg-0);
+  }
+
+  /* Subtle grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: .04;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.5) 0 1px, transparent 1px 3px);
+    mix-blend-mode: overlay;
+  }
+
+  /* Scanline effect on overlays */
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.15) 0 2px, transparent 2px 4px);
+    z-index: 2;
+  }
+
+  /* ============================================================
+     Game Frame
+     ============================================================ */
+  #game-frame {
+    position: relative;
+    width: min(100vw, 1200px);
+    height: min(100vh, 800px);
+    aspect-ratio: 3 / 2;
+    background: var(--bg-1);
+    border: 1px solid rgba(0,240,255,.2);
+    box-shadow:
+      0 0 0 1px rgba(255,43,214,.15),
+      0 0 60px rgba(0,240,255,.18),
+      inset 0 0 120px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+
+  canvas#game {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #0a0f1f 0%, #1a0a2e 55%, #2b0d3a 100%);
+  }
+
+  /* ============================================================
+     HUD
+     ============================================================ */
+  #hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    font-family: var(--font-mono);
+  }
+
+  .hud-cell {
+    background: linear-gradient(180deg, rgba(10,15,31,.85), rgba(10,15,31,.55));
+    border: 1px solid rgba(0,240,255,.3);
+    padding: 8px 14px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .hud-cell.right {
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+
+  .hud-label {
+    font-size: 10px;
+    letter-spacing: .18em;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    opacity: .85;
+  }
+  .hud-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text-0);
+    text-shadow: var(--glow-cyan);
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .hud-value.magenta { color: var(--neon-magenta); text-shadow: var(--glow-magenta); }
+  .hud-value.yellow { color: var(--neon-yellow); text-shadow: var(--glow-yellow); }
+  .hud-value.green { color: var(--neon-green); text-shadow: var(--glow-green); }
+
+  #hud-top-left { grid-column: 1; grid-row: 1; display: flex; gap: 10px; align-items: flex-start; }
+  #hud-top-center { grid-column: 2; grid-row: 1; text-align: center; }
+  #hud-top-right { grid-column: 3; grid-row: 1; display: flex; gap: 10px; justify-content: flex-end; align-items: flex-start; }
+  #hud-bottom { grid-column: 1 / -1; grid-row: 3; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+
+  .leads-bar {
+    height: 8px;
+    width: 140px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,43,214,.3);
+    overflow: hidden;
+    margin-top: 6px;
+    position: relative;
+  }
+  .leads-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-magenta), var(--neon-violet));
+    box-shadow: 0 0 12px var(--neon-magenta);
+    transition: width .25s ease;
+  }
+
+  #combo-display {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 64px;
+    color: var(--neon-yellow);
+    text-shadow: var(--glow-yellow);
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 6;
+  }
+  #combo-display.active { opacity: 1; }
+  #combo-display .x { font-size: 32px; opacity: .8; }
+
+  /* Toast notifications */
+  #toasts {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+  }
+  .toast {
+    background: linear-gradient(135deg, rgba(10,15,31,.95), rgba(26,36,86,.85));
+    border: 1px solid rgba(57,255,126,.5);
+    color: var(--neon-green);
+    padding: 10px 22px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    box-shadow: var(--glow-green);
+    animation: toastIn .4s ease, toastOut .4s ease 2.6s forwards;
+  }
+  .toast.magenta { border-color: rgba(255,43,214,.5); color: var(--neon-magenta); box-shadow: var(--glow-magenta); }
+  .toast.cyan { border-color: rgba(0,240,255,.5); color: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+  .toast.yellow { border-color: rgba(255,230,0,.5); color: var(--neon-yellow); box-shadow: var(--glow-yellow); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(-12px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes toastOut {
+    to { opacity: 0; transform: translateY(-8px) scale(.96); }
+  }
+
+  /* ============================================================
+     Modal overlays
+     ============================================================ */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: radial-gradient(ellipse at center, rgba(10,15,31,.85), rgba(5,7,15,.97));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+  }
+  .overlay.show { display: flex; }
+  .overlay.show .panel { animation: panelIn .5s cubic-bezier(.16,1,.3,1); }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .panel {
+    position: relative;
+    max-width: 720px;
+    width: 100%;
+    background:
+      linear-gradient(135deg, rgba(17,24,53,.95), rgba(10,15,31,.95));
+    border: 1px solid rgba(0,240,255,.35);
+    box-shadow:
+      0 0 80px rgba(0,240,255,.15),
+      inset 0 0 80px rgba(138,59,255,.06);
+    padding: 36px 40px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .panel.magenta { border-color: rgba(255,43,214,.4); box-shadow: 0 0 80px rgba(255,43,214,.18); }
+  .panel.yellow { border-color: rgba(255,230,0,.4); box-shadow: 0 0 80px rgba(255,230,0,.15); }
+
+  .panel h1, .panel h2 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    letter-spacing: .04em;
+    line-height: 1.05;
+  }
+  .panel h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta) 60%, var(--neon-violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 6px;
+  }
+  .panel h2 {
+    font-size: 22px;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan);
+    margin-bottom: 14px;
+  }
+  .panel .subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-1);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .panel p {
+    color: var(--text-1);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .panel ul { list-style: none; }
+
+  /* ============================================================
+     Buttons
+     ============================================================ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet));
+    color: var(--bg-0);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: transform .15s, filter .2s;
+    pointer-events: auto;
+  }
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
+  .btn:active { transform: translateY(0); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+    box-shadow: var(--glow-cyan);
+  }
+  .btn.danger {
+    background: linear-gradient(135deg, var(--neon-magenta), var(--neon-red));
+    color: var(--text-0);
+  }
+
+  /* ============================================================
+     Module list (CRM upgrades)
+     ============================================================ */
+  .module-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0 22px;
+  }
+  .module {
+    background: linear-gradient(135deg, rgba(0,240,255,.06), rgba(255,43,214,.06));
+    border: 1px solid rgba(0,240,255,.2);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+  .module:hover:not(.locked):not(.owned) {
+    border-color: var(--neon-cyan);
+    background: linear-gradient(135deg, rgba(0,240,255,.15), rgba(255,43,214,.1));
+  }
+  .module.owned {
+    border-color: var(--neon-green);
+    background: linear-gradient(135deg, rgba(57,255,126,.1), rgba(57,255,126,.04));
+    cursor: default;
+  }
+  .module.locked { opacity: .35; cursor: not-allowed; }
+  .module-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-0);
+    letter-spacing: .06em;
+  }
+  .module-desc {
+    font-size: 11px;
+    color: var(--text-2);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .module-cost {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--neon-yellow);
+  }
+  .module.owned .module-cost { color: var(--neon-green); }
+  .module.owned .module-cost::before { content: '✓ '; }
+
+  /* ============================================================
+     Code Breaker mini-game
+     ============================================================ */
+  #code-panel .code-block {
+    background: var(--bg-0);
+    border: 1px solid var(--neon-violet);
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--neon-cyan);
+    margin: 14px 0;
+    line-height: 1.6;
+    box-shadow: inset 0 0 30px rgba(138,59,255,.15);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #code-panel .code-block .kw { color: var(--neon-magenta); }
+  #code-panel .code-block .str { color: var(--neon-yellow); }
+  #code-panel .code-block .com { color: var(--text-2); font-style: italic; }
+  #code-panel .code-block .num { color: var(--neon-green); }
+
+  .code-answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .answer-btn {
+    background: rgba(10,15,31,.7);
+    border: 1px solid rgba(0,240,255,.3);
+    color: var(--text-0);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .15s;
+  }
+  .answer-btn:hover { background: rgba(0,240,255,.1); border-color: var(--neon-cyan); }
+  .answer-btn.correct { background: rgba(57,255,126,.2); border-color: var(--neon-green); color: var(--neon-green); }
+  .answer-btn.wrong { background: rgba(255,43,214,.2); border-color: var(--neon-red); color: var(--neon-red); }
+
+  .code-timer {
+    height: 4px;
+    background: rgba(255,255,255,.1);
+    margin: 16px 0 6px;
+    overflow: hidden;
+  }
+  .code-timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-green), var(--neon-yellow), var(--neon-red));
+    width: 100%;
+    transition: width .1s linear;
+  }
+
+  /* ============================================================
+     Stats Grid (game over)
+     ============================================================ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 18px 0;
+  }
+  .stat {
+    background: rgba(0,240,255,.05);
+    border: 1px solid rgba(0,240,255,.2);
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-2);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan);
+    margin-top: 4px;
+  }
+
+  /* Leaderboard */
+  .leaderboard {
+    margin: 14px 0;
+    border: 1px solid rgba(0,240,255,.2);
+  }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto auto;
+    gap: 12px;
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-bottom: 1px solid rgba(0,240,255,.08);
+    align-items: center;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row.you { background: rgba(255,230,0,.06); color: var(--neon-yellow); }
+  .lb-rank { color: var(--text-2); }
+  .lb-rank.gold { color: var(--neon-yellow); font-weight: 700; }
+  .lb-name { color: var(--text-0); }
+  .lb-score { color: var(--neon-cyan); }
+
+  /* Top corner: language + sound toggle */
+  #top-controls {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 8;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(10,15,31,.7);
+    border: 1px solid rgba(0,240,255,.3);
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all .15s;
+  }
+  .icon-btn:hover { background: rgba(0,240,255,.15); border-color: var(--neon-cyan); }
+
+  /* Day challenge banner */
+  .daily-banner {
+    background: linear-gradient(90deg, rgba(255,230,0,.1), rgba(255,43,214,.1));
+    border: 1px solid rgba(255,230,0,.3);
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--neon-yellow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .controls-hint {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .key {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,240,255,.08);
+    border: 1px solid rgba(0,240,255,.2);
+    color: var(--neon-cyan);
+    margin-right: 4px;
+  }
+
+  /* Tab system in start screen */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(0,240,255,.15);
+  }
+  .tab {
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .15s;
+  }
+  .tab.active {
+    color: var(--neon-cyan);
+    border-bottom-color: var(--neon-cyan);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Achievement grid */
+  .ach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .ach {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(0,240,255,.1);
+    padding: 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-2);
+  }
+  .ach.unlocked {
+    border-color: var(--neon-yellow);
+    background: rgba(255,230,0,.06);
+    color: var(--neon-yellow);
+  }
+  .ach-icon { font-size: 18px; margin-bottom: 4px; }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    #game-frame {
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: unset;
+      border: none;
+    }
+    .panel { padding: 22px; }
+    .module-list, .stats-grid, .code-answers { grid-template-columns: 1fr; }
+    .hud-value { font-size: 16px; }
+    #combo-display { font-size: 40px; right: 14px; }
+  }
+
+  /* Mobile touch controls */
+  #touch-controls {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    display: none;
+    justify-content: space-between;
+    padding: 0 22px;
+    pointer-events: none;
+  }
+  .touch-btn {
+    width: 70px;
+    height: 70px;
+    background: rgba(10,15,31,.6);
+    border: 2px solid rgba(0,240,255,.4);
+    color: var(--neon-cyan);
+    font-size: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    pointer-events: auto;
+    backdrop-filter: blur(6px);
+  }
+  @media (hover: none) and (pointer: coarse) {
+    #touch-controls.show { display: flex; }
+  }
+</style>
+</head>
+<body>
+<div id="game-frame">
+  <canvas id="game"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="hud-top-left">
+      <div class="hud-cell">
+        <div class="hud-label" data-i18n="dist">DIST</div>
+        <div class="hud-value" id="hud-distance">0M</div>
+      </div>
+      <div class="hud-cell">
+        <div class="hud-label" data-i18n="speed">SPEED</div>
+        <div class="hud-value cyan" id="hud-speed">0</div>
+      </div>
+    </div>
+    <div id="hud-top-center">
+      <div class="hud-cell">
+        <div class="hud-label" data-i18n="score">SCORE</div>
+        <div class="hud-value yellow" id="hud-score">0</div>
+      </div>
+    </div>
+    <div id="hud-top-right">
+      <div class="hud-cell right">
+        <div class="hud-label" data-i18n="leads">LEADS</div>
+        <div class="hud-value magenta" id="hud-leads">0</div>
+        <div class="leads-bar"><div class="leads-bar-fill" id="leads-fill" style="width:0%"></div></div>
+      </div>
+      <div class="hud-cell right">
+        <div class="hud-label" data-i18n="credits">CREDITS</div>
+        <div class="hud-value green" id="hud-credits">0</div>
+      </div>
+    </div>
+    <div id="hud-bottom"></div>
+  </div>
+
+  <div id="combo-display"><span id="combo-x">×</span><span id="combo-n">2</span></div>
+  <div id="toasts"></div>
+
+  <div id="top-controls">
+    <button class="icon-btn" id="btn-lang" title="Language">RO</button>
+    <button class="icon-btn" id="btn-sound" title="Sound">♪</button>
+    <button class="icon-btn" id="btn-pause" title="Pause">⏸</button>
+  </div>
+
+  <!-- Touch controls for mobile -->
+  <div id="touch-controls">
+    <div class="touch-btn" id="touch-left">◀</div>
+    <div class="touch-btn" id="touch-right">▶</div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="overlay show scanlines" id="overlay-start">
+    <div class="panel">
+      <div class="subtitle" data-i18n="boot">// SYSTEM BOOT · v1.0 · LAURANDREEA10</div>
+      <h1>NEXUS PROTOCOL</h1>
+      <p data-i18n="tagline">Endless runner neon. CRM tycoon. Code challenges. Trei layere într-un singur drum prin sectorul neon.</p>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="brief" data-i18n="tab-brief">BRIEF</div>
+        <div class="tab" data-tab="controls" data-i18n="tab-controls">CONTROLS</div>
+        <div class="tab" data-tab="lore" data-i18n="tab-lore">LORE</div>
+      </div>
+
+      <div class="tab-content active" id="tab-brief">
+        <p data-i18n="brief-1"><b style="color:var(--neon-cyan)">Drive:</b> Conduci pe o autostradă neon. Evită obstacolele, prinde lead-uri și energy.</p>
+        <p data-i18n="brief-2"><b style="color:var(--neon-magenta)">CRM:</b> La fiecare 10 lead-uri triezi, deblochezi module care îți dau boost-uri permanente.</p>
+        <p data-i18n="brief-3"><b style="color:var(--neon-yellow)">Code Breaker:</b> La 1000m, 2000m, 3000m... răspunzi la un challenge tehnic (regex/CSS/JS). Corect → multiplier ×2.</p>
+        <div class="daily-banner" id="daily-banner">
+          <span><span data-i18n="daily">DAILY CHALLENGE</span>: <span id="daily-text">—</span></span>
+          <span id="daily-reward">+500 CR</span>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-controls">
+        <div class="controls-hint">
+          <span><span class="key">A</span> <span class="key">←</span> <span data-i18n="left">stânga</span></span>
+          <span><span class="key">D</span> <span class="key">→</span> <span data-i18n="right">dreapta</span></span>
+          <span><span class="key">SPACE</span> <span data-i18n="boost">boost</span></span>
+          <span><span class="key">P</span> / <span class="key">ESC</span> <span data-i18n="pause">pauză</span></span>
+        </div>
+        <p style="margin-top:14px" data-i18n="ctrl-desc">Pe mobil: butoanele de jos pentru lane change. Mașina ține poziția până schimbi.</p>
+      </div>
+
+      <div class="tab-content" id="tab-lore">
+        <p data-i18n="lore-1"><i>Anul 2087. Sectorul comercial al orașului-rețea funcționează autonom. Tu ești ultimul Agent Nexus — operator hibrid care livrează lead-uri prin coridorul magnetic.</i></p>
+        <p data-i18n="lore-2"><i>Fiecare client închis e o pulsație în grilă. Fiecare modul activat extinde domeniul tău. Restul e viteză.</i></p>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btn-start" data-i18n="start">▶ START RUN</button>
+        <button class="btn ghost" id="btn-show-leaderboard" data-i18n="leaderboard">LEADERBOARD</button>
+        <button class="btn ghost" id="btn-show-achievements" data-i18n="achievements">ACHIEVEMENTS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE -->
+  <div class="overlay scanlines" id="overlay-pause">
+    <div class="panel">
+      <div class="subtitle">// SYSTEM HALTED</div>
+      <h1 data-i18n="paused">PAUZĂ</h1>
+      <p data-i18n="paused-desc">Run-ul este suspendat. Datele sunt persistate temporar în memoria locală.</p>
+      <div class="actions">
+        <button class="btn" id="btn-resume" data-i18n="resume">▶ RESUME</button>
+        <button class="btn ghost" id="btn-quit" data-i18n="quit">END RUN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM UPGRADE -->
+  <div class="overlay scanlines" id="overlay-crm">
+    <div class="panel magenta">
+      <div class="subtitle">// NEXUS CRM · MODULE STORE</div>
+      <h1 data-i18n="crm-title">CRM UPGRADE</h1>
+      <p data-i18n="crm-desc">Ai închis lead-uri. Sistemul tău se extinde. Activează un modul nou:</p>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label" data-i18n="credits">CREDITS</div><div class="stat-value" id="crm-credits">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="leads-closed">LEADS</div><div class="stat-value" id="crm-leads">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="modules">MODULES</div><div class="stat-value" id="crm-modules">0/8</div></div>
+      </div>
+      <div class="module-list" id="module-list"></div>
+      <div class="actions">
+        <button class="btn" id="btn-crm-continue" data-i18n="continue">▶ CONTINUE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CODE BREAKER -->
+  <div class="overlay scanlines" id="overlay-code">
+    <div class="panel yellow" id="code-panel">
+      <div class="subtitle">// CHECKPOINT · CODE BREAKER</div>
+      <h1 style="color:var(--neon-yellow);-webkit-text-fill-color:var(--neon-yellow);background:none;text-shadow:var(--glow-yellow)" data-i18n="checkpoint">CHECKPOINT</h1>
+      <p id="code-question" data-i18n="code-q">Ce returnează această expresie?</p>
+      <div class="code-block" id="code-block"></div>
+      <div class="code-timer"><div class="code-timer-fill" id="code-timer"></div></div>
+      <div class="code-answers" id="code-answers"></div>
+      <p style="margin-top:14px;font-size:12px" data-i18n="code-reward"><b style="color:var(--neon-yellow)">Reward:</b> Corect → combo ×2 timp de 15s + 200 credits. Greșit → încetinire 3s.</p>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="overlay scanlines" id="overlay-end">
+    <div class="panel">
+      <div class="subtitle" data-i18n="run-complete">// RUN TERMINATED · SECTOR LOG SAVED</div>
+      <h1 data-i18n="game-over">GAME OVER</h1>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label" data-i18n="dist">DIST</div><div class="stat-value" id="end-dist">0M</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="score">SCORE</div><div class="stat-value" id="end-score">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="leads">LEADS</div><div class="stat-value" id="end-leads">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="credits">CR</div><div class="stat-value" id="end-credits">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="checkpoints">CHK</div><div class="stat-value" id="end-checkpoints">0</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="modules">MOD</div><div class="stat-value" id="end-modules">0</div></div>
+      </div>
+      <h2 data-i18n="top-runs">TOP RUNS</h2>
+      <div class="leaderboard" id="end-leaderboard"></div>
+      <div class="actions">
+        <button class="btn" id="btn-retry" data-i18n="retry">▶ NEW RUN</button>
+        <button class="btn ghost" id="btn-home" data-i18n="home">HOME</button>
+        <button class="btn ghost" id="btn-share" data-i18n="share">SHARE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD modal -->
+  <div class="overlay scanlines" id="overlay-leaderboard">
+    <div class="panel">
+      <div class="subtitle">// TOP OPERATORS · LOCAL CACHE</div>
+      <h1 data-i18n="leaderboard">LEADERBOARD</h1>
+      <div class="leaderboard" id="main-leaderboard"></div>
+      <div class="actions">
+        <button class="btn" id="btn-lb-close" data-i18n="back">◀ BACK</button>
+        <button class="btn ghost" id="btn-lb-reset" data-i18n="reset">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS modal -->
+  <div class="overlay scanlines" id="overlay-ach">
+    <div class="panel">
+      <div class="subtitle">// ACHIEVEMENT LOG</div>
+      <h1 data-i18n="achievements">ACHIEVEMENTS</h1>
+      <div class="ach-grid" id="ach-grid"></div>
+      <div class="actions">
+        <button class="btn" id="btn-ach-close" data-i18n="back">◀ BACK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   NEXUS PROTOCOL — Game Logic
+   Single-file game by Laura Andreea
+   ============================================================ */
+'use strict';
+
+/* ----------- i18n ----------- */
+const I18N = {
+  ro: {
+    dist: 'DIST', speed: 'VITEZĂ', score: 'SCOR', leads: 'LEAD-URI',
+    credits: 'CREDITE', boot: '// BOOT SISTEM · v1.0 · LAURANDREEA10',
+    tagline: 'Endless runner neon. CRM tycoon. Code challenges. Trei layere într-un singur drum prin sectorul neon.',
+    'tab-brief': 'BRIEF', 'tab-controls': 'CONTROLS', 'tab-lore': 'LORE',
+    'brief-1': '<b style="color:var(--neon-cyan)">Drive:</b> Conduci pe o autostradă neon. Evită obstacolele, prinde lead-uri și energy.',
+    'brief-2': '<b style="color:var(--neon-magenta)">CRM:</b> La fiecare 10 lead-uri triezi, deblochezi module care îți dau boost-uri permanente.',
+    'brief-3': '<b style="color:var(--neon-yellow)">Code Breaker:</b> La 1000m, 2000m, 3000m... răspunzi la un challenge tehnic (regex/CSS/JS). Corect → multiplier ×2.',
+    daily: 'PROVOCARE ZILNICĂ',
+    left: 'stânga', right: 'dreapta', boost: 'boost', pause: 'pauză',
+    'ctrl-desc': 'Pe mobil: butoanele de jos pentru lane change. Mașina ține poziția până schimbi.',
+    'lore-1': '<i>Anul 2087. Sectorul comercial al orașului-rețea funcționează autonom. Tu ești ultimul Agent Nexus — operator hibrid care livrează lead-uri prin coridorul magnetic.</i>',
+    'lore-2': '<i>Fiecare client închis e o pulsație în grilă. Fiecare modul activat extinde domeniul tău. Restul e viteză.</i>',
+    start: '▶ START RUN', leaderboard: 'LEADERBOARD', achievements: 'ACHIEVEMENTS',
+    paused: 'PAUZĂ', 'paused-desc': 'Run-ul este suspendat. Datele sunt persistate temporar.',
+    resume: '▶ CONTINUĂ', quit: 'ÎNCHEIE RUN',
+    'crm-title': 'UPGRADE CRM', 'crm-desc': 'Ai închis lead-uri. Sistemul tău se extinde. Activează un modul nou:',
+    'leads-closed': 'LEAD-URI', modules: 'MODULE', continue: '▶ CONTINUĂ',
+    checkpoint: 'CHECKPOINT', 'code-q': 'Ce returnează această expresie?',
+    'code-reward': '<b style="color:var(--neon-yellow)">Recompensă:</b> Corect → combo ×2 timp de 15s + 200 credite. Greșit → încetinire 3s.',
+    'run-complete': '// RUN ÎNCHEIAT · LOG SECTOR SALVAT', 'game-over': 'GAME OVER',
+    checkpoints: 'CHK', 'top-runs': 'TOP RUN-URI',
+    retry: '▶ RUN NOU', home: 'ACASĂ', share: 'SHARE',
+    back: '◀ ÎNAPOI', reset: 'RESET',
+    'ach-1': 'Primul kilometru', 'ach-2': 'Combo ×5', 'ach-3': '10 lead-uri', 'ach-4': 'Hacker',
+    'ach-5': '5000m', 'ach-6': 'Toate modulele', 'ach-7': 'Speedster', 'ach-8': 'Streak 3 zile',
+    locked: 'BLOCAT', owned: 'ACTIV',
+    toast_lead: 'LEAD ÎNCHIS', toast_module: 'MODUL ACTIVAT', toast_combo: 'COMBO',
+    toast_correct: 'COD VALIDAT · ×2', toast_wrong: 'CHECKPOINT EȘUAT',
+    toast_crash: 'COLIZIUNE', toast_boost: 'BOOST', toast_ach: 'ACHIEVEMENT',
+    daily_share: 'Run complet pe NEXUS PROTOCOL!',
+  },
+  en: {
+    dist: 'DIST', speed: 'SPEED', score: 'SCORE', leads: 'LEADS',
+    credits: 'CREDITS', boot: '// SYSTEM BOOT · v1.0 · LAURANDREEA10',
+    tagline: 'Neon endless runner. CRM tycoon. Code challenges. Three layers on one road through the neon sector.',
+    'tab-brief': 'BRIEF', 'tab-controls': 'CONTROLS', 'tab-lore': 'LORE',
+    'brief-1': '<b style="color:var(--neon-cyan)">Drive:</b> Drive a neon highway. Dodge obstacles, grab leads and energy.',
+    'brief-2': '<b style="color:var(--neon-magenta)">CRM:</b> Every 10 leads you triage unlock a module that grants permanent boosts.',
+    'brief-3': '<b style="color:var(--neon-yellow)">Code Breaker:</b> At 1000m, 2000m, 3000m... you answer a tech challenge (regex/CSS/JS). Right → ×2 multiplier.',
+    daily: 'DAILY CHALLENGE',
+    left: 'left', right: 'right', boost: 'boost', pause: 'pause',
+    'ctrl-desc': 'On mobile: bottom buttons for lane change. The car holds the lane until you switch.',
+    'lore-1': '<i>Year 2087. The commercial sector of the network-city runs autonomously. You are the last Nexus Agent — a hybrid operator delivering leads through the magnetic corridor.</i>',
+    'lore-2': '<i>Every closed client is a pulse in the grid. Every module activated extends your domain. The rest is speed.</i>',
+    start: '▶ START RUN', leaderboard: 'LEADERBOARD', achievements: 'ACHIEVEMENTS',
+    paused: 'PAUSED', 'paused-desc': 'Run is suspended. Data persisted in local memory.',
+    resume: '▶ RESUME', quit: 'END RUN',
+    'crm-title': 'CRM UPGRADE', 'crm-desc': 'You closed leads. Your system expands. Activate a new module:',
+    'leads-closed': 'LEADS', modules: 'MODULES', continue: '▶ CONTINUE',
+    checkpoint: 'CHECKPOINT', 'code-q': 'What does this expression return?',
+    'code-reward': '<b style="color:var(--neon-yellow)">Reward:</b> Right → combo ×2 for 15s + 200 credits. Wrong → 3s slowdown.',
+    'run-complete': '// RUN TERMINATED · SECTOR LOG SAVED', 'game-over': 'GAME OVER',
+    checkpoints: 'CHK', 'top-runs': 'TOP RUNS',
+    retry: '▶ NEW RUN', home: 'HOME', share: 'SHARE',
+    back: '◀ BACK', reset: 'RESET',
+    'ach-1': 'First kilometer', 'ach-2': 'Combo ×5', 'ach-3': '10 leads', 'ach-4': 'Hacker',
+    'ach-5': '5000m', 'ach-6': 'All modules', 'ach-7': 'Speedster', 'ach-8': '3-day streak',
+    locked: 'LOCKED', owned: 'OWNED',
+    toast_lead: 'LEAD CLOSED', toast_module: 'MODULE ACTIVE', toast_combo: 'COMBO',
+    toast_correct: 'CODE VALID · ×2', toast_wrong: 'CHECKPOINT FAILED',
+    toast_crash: 'COLLISION', toast_boost: 'BOOST', toast_ach: 'ACHIEVEMENT',
+    daily_share: 'Complete run on NEXUS PROTOCOL!',
+  }
+};
+
+let LANG = localStorage.getItem('nexus.lang') || 'ro';
+
+function t(key) {
+  return (I18N[LANG] && I18N[LANG][key]) || I18N.ro[key] || key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const v = t(key);
+    if (v.includes('<')) el.innerHTML = v;
+    else el.textContent = v;
+  });
+  document.getElementById('btn-lang').textContent = LANG.toUpperCase();
+}
+
+/* ----------- Storage helpers ----------- */
+const Store = {
+  get(k, fallback) {
+    try { const v = localStorage.getItem('nexus.' + k); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
+  },
+  set(k, v) {
+    try { localStorage.setItem('nexus.' + k, JSON.stringify(v)); } catch {}
+  }
+};
+
+/* ----------- Audio (Web Audio API, no assets) ----------- */
+const Audio = {
+  ctx: null, enabled: Store.get('sound', true), master: null,
+  init() {
+    if (this.ctx) return;
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = this.enabled ? 0.18 : 0;
+      this.master.connect(this.ctx.destination);
+    } catch {}
+  },
+  toggle() {
+    this.enabled = !this.enabled;
+    Store.set('sound', this.enabled);
+    if (this.master) this.master.gain.value = this.enabled ? 0.18 : 0;
+    document.getElementById('btn-sound').textContent = this.enabled ? '♪' : '♪̸';
+  },
+  beep(freq=440, dur=0.08, type='square', vol=1) {
+    if (!this.ctx || !this.enabled) return;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, this.ctx.currentTime);
+    g.gain.linearRampToValueAtTime(vol, this.ctx.currentTime + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
+    o.connect(g); g.connect(this.master);
+    o.start(); o.stop(this.ctx.currentTime + dur);
+  },
+  lead() { this.beep(880, .08, 'sine', .8); setTimeout(()=>this.beep(1320, .12, 'sine', .6), 50); },
+  energy() { this.beep(660, .06, 'triangle', .6); },
+  crash() { this.beep(80, .35, 'sawtooth', 1); setTimeout(()=>this.beep(50, .35, 'sawtooth', .8), 100); },
+  correct() { this.beep(523, .08, 'sine', .8); setTimeout(()=>this.beep(659, .08, 'sine', .8), 80); setTimeout(()=>this.beep(784, .14, 'sine', .8), 160); },
+  wrong() { this.beep(200, .15, 'sawtooth', .8); setTimeout(()=>this.beep(150, .2, 'sawtooth', .8), 120); },
+  module() { this.beep(440, .08, 'square', .6); setTimeout(()=>this.beep(660, .08, 'square', .6), 60); setTimeout(()=>this.beep(880, .14, 'square', .6), 120); },
+  click() { this.beep(1200, .03, 'square', .4); },
+};
+
+/* ----------- Modules (CRM upgrades) ----------- */
+const MODULES = [
+  { id: 'kanban',    name_ro: 'KANBAN',         name_en: 'KANBAN',         cost: 1, desc_ro: '+10% credite din lead-uri.',            desc_en: '+10% credits from leads.' },
+  { id: 'autosave',  name_ro: 'AUTOSAVE',       name_en: 'AUTOSAVE',       cost: 2, desc_ro: 'Pierzi -1 viață la coliziune.',          desc_en: 'Lose -1 less life on crash.' },
+  { id: 'rbac',      name_ro: 'RBAC',           name_en: 'RBAC',           cost: 2, desc_ro: 'Combo nu se mai pierde la coliziune.',    desc_en: 'Combo no longer resets on crash.' },
+  { id: 'flow',      name_ro: 'FLOW BUILDER',   name_en: 'FLOW BUILDER',   cost: 3, desc_ro: 'Energy capsules dau și +1 lead.',         desc_en: 'Energy capsules also give +1 lead.' },
+  { id: 'billing',   name_ro: 'BILLING',        name_en: 'BILLING',        cost: 3, desc_ro: '+25% credite din lead-uri.',              desc_en: '+25% credits from leads.' },
+  { id: 'booking',   name_ro: 'BOOKING',        name_en: 'BOOKING',        cost: 4, desc_ro: 'Generează magnet: atrage lead-urile.',     desc_en: 'Magnet: attracts leads to you.' },
+  { id: 'ai',        name_ro: 'AI COPILOT',     name_en: 'AI COPILOT',     cost: 5, desc_ro: 'Răspuns automat la 1 challenge / run.',    desc_en: 'Auto-solve 1 challenge / run.' },
+  { id: 'quantum',   name_ro: 'QUANTUM CORE',   name_en: 'QUANTUM CORE',   cost: 7, desc_ro: 'Boost durează ×2 (10s).',                  desc_en: 'Boost lasts ×2 (10s).' },
+];
+
+/* ----------- Code Breaker Questions ----------- */
+const CHALLENGES = [
+  {
+    code: '<span class="kw">typeof</span> <span class="kw">null</span>',
+    q_ro: 'Ce returnează această expresie?', q_en: 'What does this expression return?',
+    answers: ['"object"', '"null"', '"undefined"', 'null'], correct: 0
+  },
+  {
+    code: '[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>].<span class="kw">map</span>(<span class="kw">String</span>)',
+    q_ro: 'Rezultatul?', q_en: 'Result?',
+    answers: ["['1','2','3']", "[1,2,3]", "'1,2,3'", 'Error'], correct: 0
+  },
+  {
+    code: '<span class="kw">const</span> a = [<span class="num">1</span>,<span class="num">2</span>];\n<span class="kw">const</span> b = a;\nb.push(<span class="num">3</span>);\na.length;',
+    q_ro: 'Ce returnează ultima linie?', q_en: 'Last line returns?',
+    answers: ['3', '2', 'undefined', 'Error'], correct: 0
+  },
+  {
+    code: '/^\\d{3}$/.<span class="kw">test</span>(<span class="str">"4321"</span>)',
+    q_ro: 'Regex test result?', q_en: 'Regex test result?',
+    answers: ['false', 'true', 'null', '"4321"'], correct: 0
+  },
+  {
+    code: '<span class="com">/* CSS */</span>\n.btn:nth-child(2n+<span class="num">1</span>) { color: red }',
+    q_ro: 'Pe care elemente se aplică?', q_en: 'Which elements match?',
+    answers: ['Indici impari (1,3,5...)', 'Indici pari (2,4,6...)', 'Doar primul', 'Toate'], correct: 0
+  },
+  {
+    code: '<span class="kw">Boolean</span>(<span class="str">""</span>) || <span class="kw">Boolean</span>(<span class="str">"0"</span>)',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['true', 'false', '"0"', 'NaN'], correct: 0
+  },
+  {
+    code: '[<span class="num">10</span>,<span class="num">1</span>,<span class="num">2</span>].<span class="kw">sort</span>()',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['[1,10,2]', '[1,2,10]', '[10,2,1]', 'Error'], correct: 0
+  },
+  {
+    code: '<span class="kw">const</span> x = <span class="num">0.1</span> + <span class="num">0.2</span>;\nx === <span class="num">0.3</span>;',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['false', 'true', '0.3', 'NaN'], correct: 0
+  },
+  {
+    code: '<span class="com">// CSS Specificity</span>\n#id .class vs .a.b.c',
+    q_ro: 'Care specificitate câștigă?', q_en: 'Which specificity wins?',
+    answers: ['#id .class', '.a.b.c', 'Egale', 'Depinde de ordine'], correct: 0
+  },
+  {
+    code: '<span class="kw">await</span> <span class="kw">Promise</span>.all([])',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['[]', 'undefined', 'null', 'Error'], correct: 0
+  },
+  {
+    code: '<span class="str">"5"</span> - <span class="num">2</span>',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['3', '"3"', '"52"', 'NaN'], correct: 0
+  },
+  {
+    code: '<span class="kw">typeof</span> []',
+    q_ro: 'Rezultat?', q_en: 'Result?',
+    answers: ['"object"', '"array"', '"list"', 'Array'], correct: 0
+  },
+];
+
+/* ----------- Achievements ----------- */
+const ACHIEVEMENTS = [
+  { id: 'first_km', icon: '🛣', t_ro: 'Primul kilometru', t_en: 'First kilometer', desc_ro: 'Atinge 1000m', desc_en: 'Reach 1000m' },
+  { id: 'combo5', icon: '🔥', t_ro: 'Combo ×5', t_en: 'Combo ×5', desc_ro: 'Atinge combo 5', desc_en: 'Reach combo 5' },
+  { id: 'leads10', icon: '💼', t_ro: '10 lead-uri', t_en: '10 leads', desc_ro: 'Închide 10 lead-uri într-un run', desc_en: 'Close 10 leads in one run' },
+  { id: 'hacker', icon: '🧠', t_ro: 'Hacker', t_en: 'Hacker', desc_ro: 'Răspunde corect la 3 challenges', desc_en: 'Solve 3 challenges correctly' },
+  { id: 'far', icon: '🌌', t_ro: '5000m', t_en: '5000m', desc_ro: 'Atinge 5000m', desc_en: 'Reach 5000m' },
+  { id: 'all_modules', icon: '⚡', t_ro: 'Toate modulele', t_en: 'All modules', desc_ro: 'Activează toate modulele', desc_en: 'Activate all modules' },
+  { id: 'speed', icon: '🚀', t_ro: 'Speedster', t_en: 'Speedster', desc_ro: 'Folosește boost de 5 ori', desc_en: 'Use boost 5 times' },
+  { id: 'streak3', icon: '📅', t_ro: 'Streak 3 zile', t_en: '3-day streak', desc_ro: '3 zile consecutive', desc_en: 'Play 3 days in a row' },
+];
+
+let unlocked = Store.get('achievements', {});
+
+function unlock(id) {
+  if (unlocked[id]) return;
+  unlocked[id] = true;
+  Store.set('achievements', unlocked);
+  const ach = ACHIEVEMENTS.find(a => a.id === id);
+  toast(`🏆 ${ach['t_' + LANG]}`, 'yellow');
+  Audio.module();
+}
+
+/* ----------- Daily Challenge ----------- */
+function getDaily() {
+  const d = new Date();
+  const seed = d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  const types = [
+    { ro: 'Atinge 2000m fără coliziune', en: 'Reach 2000m without crashing', reward: 500 },
+    { ro: 'Închide 15 lead-uri', en: 'Close 15 leads', reward: 600 },
+    { ro: 'Răspunde corect la 2 challenges', en: 'Solve 2 challenges correctly', reward: 700 },
+    { ro: 'Combo ×8', en: 'Reach combo ×8', reward: 800 },
+    { ro: 'Run cu scor 10000+', en: 'Score 10,000+ in one run', reward: 1000 },
+  ];
+  return { ...types[seed % types.length], date: d.toDateString() };
+}
+
+function updateDailyBanner() {
+  const d = getDaily();
+  document.getElementById('daily-text').textContent = d[LANG];
+  document.getElementById('daily-reward').textContent = '+' + d.reward + ' CR';
+}
+
+function checkStreak() {
+  const today = new Date().toDateString();
+  const streak = Store.get('streak', { last: null, count: 0 });
+  if (streak.last === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  if (streak.last === y.toDateString()) streak.count++;
+  else streak.count = 1;
+  streak.last = today;
+  Store.set('streak', streak);
+  if (streak.count >= 3) unlock('streak3');
+}
+
+/* ----------- Toast ----------- */
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+/* ============================================================
+   GAME ENGINE
+   ============================================================ */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  W = rect.width; H = rect.height;
+}
+
+window.addEventListener('resize', resize);
+
+/* ----------- Game State ----------- */
+const G = {
+  state: 'menu', // menu, running, paused, crm, code, gameover
+  lanes: [0.25, 0.5, 0.75], // 3 lanes (x ratios)
+  car: {
+    lane: 1, // index
+    x: 0,
+    y: 0,
+    targetX: 0,
+    width: 36, height: 56,
+    lives: 3,
+    invincible: 0,
+    boosting: 0,
+  },
+  speed: 4,
+  baseSpeed: 4,
+  maxSpeed: 14,
+  distance: 0,
+  score: 0,
+  leads: 0,
+  leadsTotal: 0,
+  credits: Store.get('credits', 0),
+  combo: 1,
+  comboTimer: 0,
+  multiplier: 1, // ×2 from code breaker
+  multTimer: 0,
+  obstacles: [],
+  pickups: [],
+  particles: [],
+  modules: Store.get('modules', {}),
+  checkpoint: 1, // next checkpoint at 1000 * checkpoint
+  challengesCorrect: 0,
+  boostCount: 0,
+  lastObstacleSpawn: 0,
+  lastPickupSpawn: 0,
+  pendingCRM: false,
+  hasFreeSolve: false,
+  scrollY: 0,
+  startTime: 0,
+};
+
+function hasModule(id) { return !!G.modules[id]; }
+
+/* ----------- Spawning ----------- */
+function spawnObstacle() {
+  const lane = Math.floor(Math.random() * 3);
+  G.obstacles.push({
+    type: Math.random() < 0.7 ? 'block' : 'spike',
+    lane,
+    x: G.lanes[lane] * W,
+    y: -60,
+    w: 50, h: 60,
+  });
+}
+
+function spawnPickup() {
+  const lane = Math.floor(Math.random() * 3);
+  const r = Math.random();
+  let type;
+  if (r < 0.65) type = 'lead';
+  else if (r < 0.85) type = 'energy';
+  else type = 'boost';
+  G.pickups.push({ type, lane, x: G.lanes[lane] * W, y: -30, w: 26, h: 26, t: 0 });
+}
+
+function spawnParticle(x, y, color, count=8) {
+  for (let i=0; i<count; i++) {
+    G.particles.push({
+      x, y,
+      vx: (Math.random()-.5) * 6,
+      vy: (Math.random()-.5) * 6 - 2,
+      life: 1,
+      color,
+      size: 2 + Math.random() * 3,
+    });
+  }
+}
+
+/* ----------- Update ----------- */
+function update(dt) {
+  if (G.state !== 'running') return;
+
+  // Speed ramp
+  G.speed = Math.min(G.maxSpeed, G.baseSpeed + G.distance / 500);
+  if (G.car.boosting > 0) {
+    G.speed *= 1.7;
+    G.car.boosting -= dt;
+  }
+
+  G.distance += G.speed * dt * 6;
+  G.scrollY += G.speed * dt * 60;
+
+  // Score per distance
+  G.score += Math.floor(G.speed * dt * 6) * G.multiplier;
+
+  // Car smooth lane transition
+  G.car.targetX = G.lanes[G.car.lane] * W;
+  G.car.x += (G.car.targetX - G.car.x) * 0.18;
+  G.car.y = H - 110;
+
+  if (G.car.invincible > 0) G.car.invincible -= dt;
+
+  // Combo timer
+  if (G.comboTimer > 0) {
+    G.comboTimer -= dt;
+    if (G.comboTimer <= 0) G.combo = 1;
+  }
+  if (G.multTimer > 0) {
+    G.multTimer -= dt;
+    if (G.multTimer <= 0) G.multiplier = 1;
+  }
+
+  // Spawn rate
+  G.lastObstacleSpawn += dt;
+  G.lastPickupSpawn += dt;
+  const obSpawnRate = Math.max(0.55, 1.4 - G.distance / 8000);
+  if (G.lastObstacleSpawn > obSpawnRate) {
+    spawnObstacle();
+    G.lastObstacleSpawn = 0;
+  }
+  const pickupRate = 0.7;
+  if (G.lastPickupSpawn > pickupRate) {
+    spawnPickup();
+    G.lastPickupSpawn = 0;
+  }
+
+  // Move obstacles
+  const moveSpeed = G.speed * 60;
+  G.obstacles.forEach(o => o.y += moveSpeed * dt);
+  G.obstacles = G.obstacles.filter(o => o.y < H + 80);
+
+  // Move pickups + magnet effect
+  G.pickups.forEach(p => {
+    p.y += moveSpeed * dt;
+    p.t += dt;
+    if (hasModule('booking') && p.type === 'lead') {
+      // Magnet: pull toward car when close
+      const dist = Math.abs(p.y - G.car.y);
+      if (dist < 200) {
+        p.x += (G.car.x - p.x) * 0.06;
+      }
+    }
+  });
+  G.pickups = G.pickups.filter(p => p.y < H + 30);
+
+  // Particles
+  G.particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.2;
+    p.life -= dt * 1.5;
+  });
+  G.particles = G.particles.filter(p => p.life > 0);
+
+  // Collisions
+  const cx = G.car.x, cy = G.car.y;
+  const cw = G.car.width, ch = G.car.height;
+
+  G.obstacles.forEach((o, i) => {
+    if (Math.abs(o.x - cx) < (cw + o.w) / 2 - 8 && Math.abs(o.y - cy) < (ch + o.h) / 2 - 8) {
+      if (G.car.invincible <= 0) {
+        hitObstacle();
+        G.obstacles.splice(i, 1);
+      }
+    }
+  });
+
+  G.pickups.forEach((p, i) => {
+    if (Math.abs(p.x - cx) < (cw + p.w) / 2 && Math.abs(p.y - cy) < (ch + p.h) / 2) {
+      collectPickup(p);
+      G.pickups.splice(i, 1);
+    }
+  });
+
+  // Checkpoint trigger (every 1000m)
+  if (G.distance >= G.checkpoint * 1000) {
+    G.checkpoint++;
+    triggerCodeBreaker();
+  }
+
+  // CRM trigger (every 10 leads)
+  if (G.leadsTotal > 0 && G.leadsTotal % 10 === 0 && !G.pendingCRM && G.leads >= 10) {
+    G.pendingCRM = true;
+    G.leads = 0;
+    setTimeout(openCRM, 200);
+  }
+
+  // Achievements
+  if (G.distance >= 1000) unlock('first_km');
+  if (G.distance >= 5000) unlock('far');
+  if (G.combo >= 5) unlock('combo5');
+  if (G.leadsTotal >= 10) unlock('leads10');
+  if (G.challengesCorrect >= 3) unlock('hacker');
+  if (G.boostCount >= 5) unlock('speed');
+  if (Object.keys(G.modules).length >= MODULES.length) unlock('all_modules');
+
+  updateHUD();
+}
+
+function hitObstacle() {
+  Audio.crash();
+  G.car.invincible = 1.5;
+  spawnParticle(G.car.x, G.car.y, '#ff3b6b', 16);
+  shake(8, 0.4);
+
+  let loss = 1;
+  if (hasModule('autosave') && Math.random() < 0.5) loss = 0;
+
+  G.car.lives -= loss;
+  if (!hasModule('rbac')) {
+    G.combo = 1;
+    G.comboTimer = 0;
+  }
+  toast(t('toast_crash'), 'magenta');
+
+  if (G.car.lives <= 0) {
+    gameOver();
+  }
+}
+
+function collectPickup(p) {
+  spawnParticle(p.x, p.y, p.type === 'lead' ? '#ff2bd6' : p.type === 'energy' ? '#00f0ff' : '#ffe600', 10);
+  if (p.type === 'lead') {
+    G.leads++;
+    G.leadsTotal++;
+    G.combo++;
+    G.comboTimer = 3;
+    let credBase = 50 * G.multiplier * G.combo;
+    if (hasModule('kanban')) credBase *= 1.1;
+    if (hasModule('billing')) credBase *= 1.25;
+    G.credits += Math.floor(credBase);
+    G.score += Math.floor(100 * G.multiplier * G.combo);
+    Audio.lead();
+    updateComboDisplay();
+  } else if (p.type === 'energy') {
+    G.score += 200 * G.multiplier;
+    if (hasModule('flow')) {
+      G.leads++; G.leadsTotal++;
+    }
+    Audio.energy();
+  } else if (p.type === 'boost') {
+    const dur = hasModule('quantum') ? 10 : 5;
+    G.car.boosting = dur;
+    G.boostCount++;
+    toast(t('toast_boost'), 'cyan');
+    Audio.beep(880, .2, 'sawtooth', .8);
+  }
+}
+
+function updateComboDisplay() {
+  const el = document.getElementById('combo-display');
+  if (G.combo > 1) {
+    document.getElementById('combo-n').textContent = G.combo;
+    el.classList.add('active');
+    clearTimeout(window._comboTimer);
+    window._comboTimer = setTimeout(()=>el.classList.remove('active'), 800);
+  }
+}
+
+let shakeX = 0, shakeY = 0, shakeTime = 0, shakeIntensity = 0;
+function shake(intensity, duration) {
+  shakeIntensity = intensity;
+  shakeTime = duration;
+}
+
+/* ----------- Drawing ----------- */
+function drawBackground() {
+  // Sky gradient already on canvas, plus moving stars/grid
+  ctx.fillStyle = '#0a0f1f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Distant sun/horizon glow
+  const grd = ctx.createLinearGradient(0, 0, 0, H * 0.6);
+  grd.addColorStop(0, 'rgba(10,15,31,1)');
+  grd.addColorStop(0.7, 'rgba(138,59,255,0.18)');
+  grd.addColorStop(1, 'rgba(255,43,214,0.25)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H * 0.6);
+
+  // Sun
+  ctx.save();
+  const sunY = H * 0.45;
+  const sunR = Math.min(W, H) * 0.12;
+  const sunG = ctx.createRadialGradient(W/2, sunY, 0, W/2, sunY, sunR);
+  sunG.addColorStop(0, 'rgba(255,230,0,.9)');
+  sunG.addColorStop(0.4, 'rgba(255,43,214,.5)');
+  sunG.addColorStop(1, 'rgba(138,59,255,0)');
+  ctx.fillStyle = sunG;
+  ctx.beginPath(); ctx.arc(W/2, sunY, sunR * 2, 0, Math.PI*2); ctx.fill();
+  // Sun horizontal lines
+  for (let i = 0; i < 5; i++) {
+    ctx.fillStyle = 'rgba(10,15,31,1)';
+    ctx.fillRect(W/2 - sunR, sunY - sunR + i * sunR * 0.5, sunR * 2, 3);
+  }
+  ctx.restore();
+
+  // Horizon grid (perspective)
+  const horizonY = H * 0.5;
+  ctx.strokeStyle = 'rgba(0,240,255,.25)';
+  ctx.lineWidth = 1;
+
+  // Horizontal lines moving away
+  const gridScroll = (G.scrollY * 0.3) % 50;
+  ctx.beginPath();
+  ctx.moveTo(0, horizonY); ctx.lineTo(W, horizonY); ctx.stroke();
+  for (let i = 1; i <= 10; i++) {
+    const z = i + (gridScroll / 50);
+    const y = horizonY + ((H - horizonY) * (z*z / 100));
+    if (y > H) continue;
+    const alpha = 1 - (z / 10);
+    ctx.strokeStyle = `rgba(0,240,255,${0.4 * alpha})`;
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Vertical perspective lines
+  ctx.strokeStyle = 'rgba(255,43,214,.3)';
+  for (let i = -8; i <= 8; i++) {
+    if (i === 0) continue;
+    ctx.beginPath();
+    ctx.moveTo(W/2, horizonY);
+    ctx.lineTo(W/2 + i * W * 0.13, H);
+    ctx.stroke();
+  }
+
+  // Road
+  ctx.fillStyle = 'rgba(10,5,20,.85)';
+  ctx.beginPath();
+  ctx.moveTo(W * 0.15, H);
+  ctx.lineTo(W * 0.4, horizonY);
+  ctx.lineTo(W * 0.6, horizonY);
+  ctx.lineTo(W * 0.85, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Road lane markers (3 lanes → 2 dividers)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,240,255,.7)';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#00f0ff';
+  ctx.shadowBlur = 10;
+  for (let lane = 1; lane <= 2; lane++) {
+    const topX = W * 0.4 + (W * 0.2) * (lane / 3);
+    const botX = W * 0.15 + (W * 0.7) * (lane / 3);
+    // Dashed
+    const dashCount = 12;
+    const offset = (G.scrollY * 1.5) % 60;
+    for (let i = 0; i < dashCount; i++) {
+      const tStart = (i / dashCount) + (offset / 600);
+      const tEnd = tStart + 0.04;
+      if (tEnd > 1) continue;
+      const x1 = topX + (botX - topX) * tStart;
+      const y1 = horizonY + (H - horizonY) * tStart;
+      const x2 = topX + (botX - topX) * tEnd;
+      const y2 = horizonY + (H - horizonY) * tEnd;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // Road edges
+  ctx.save();
+  ctx.strokeStyle = '#ff2bd6';
+  ctx.shadowColor = '#ff2bd6';
+  ctx.shadowBlur = 14;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(W * 0.4, horizonY); ctx.lineTo(W * 0.15, H);
+  ctx.moveTo(W * 0.6, horizonY); ctx.lineTo(W * 0.85, H);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawObstacles() {
+  G.obstacles.forEach(o => {
+    ctx.save();
+    if (o.type === 'block') {
+      // Holographic block
+      ctx.fillStyle = 'rgba(255,59,107,.85)';
+      ctx.shadowColor = '#ff3b6b';
+      ctx.shadowBlur = 18;
+      ctx.fillRect(o.x - o.w/2, o.y - o.h/2, o.w, o.h);
+      ctx.strokeStyle = '#ff3b6b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(o.x - o.w/2, o.y - o.h/2, o.w, o.h);
+      // Inner scanlines
+      ctx.fillStyle = 'rgba(255,255,255,.15)';
+      for (let y = -o.h/2; y < o.h/2; y += 5) {
+        ctx.fillRect(o.x - o.w/2, o.y + y, o.w, 2);
+      }
+    } else {
+      // Spike
+      ctx.fillStyle = 'rgba(255,230,0,.9)';
+      ctx.shadowColor = '#ffe600';
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.moveTo(o.x, o.y - o.h/2);
+      ctx.lineTo(o.x + o.w/2, o.y + o.h/2);
+      ctx.lineTo(o.x - o.w/2, o.y + o.h/2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#ff2bd6';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+}
+
+function drawPickups() {
+  G.pickups.forEach(p => {
+    ctx.save();
+    const pulse = Math.sin(p.t * 8) * 0.2 + 0.8;
+    if (p.type === 'lead') {
+      ctx.fillStyle = '#ff2bd6';
+      ctx.shadowColor = '#ff2bd6';
+      ctx.shadowBlur = 20 * pulse;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.w/2 * pulse, 0, Math.PI*2);
+      ctx.fill();
+      // Inner icon - briefcase
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowBlur = 0;
+      ctx.fillText('$', p.x, p.y);
+    } else if (p.type === 'energy') {
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 18 * pulse;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - p.h/2);
+      ctx.lineTo(p.x + p.w/2, p.y);
+      ctx.lineTo(p.x, p.y + p.h/2);
+      ctx.lineTo(p.x - p.w/2, p.y);
+      ctx.closePath();
+      ctx.fill();
+    } else { // boost
+      ctx.fillStyle = '#ffe600';
+      ctx.shadowColor = '#ffe600';
+      ctx.shadowBlur = 22 * pulse;
+      // Lightning bolt
+      ctx.beginPath();
+      ctx.moveTo(p.x - 4, p.y - p.h/2);
+      ctx.lineTo(p.x + 8, p.y - 4);
+      ctx.lineTo(p.x + 2, p.y - 2);
+      ctx.lineTo(p.x + 8, p.y + p.h/2);
+      ctx.lineTo(p.x - 6, p.y + 4);
+      ctx.lineTo(p.x, p.y + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+function drawCar() {
+  ctx.save();
+  const x = G.car.x, y = G.car.y;
+  const w = G.car.width, h = G.car.height;
+
+  // Blink when invincible
+  if (G.car.invincible > 0 && Math.floor(G.car.invincible * 10) % 2) {
+    ctx.globalAlpha = 0.4;
+  }
+
+  // Boost trail
+  if (G.car.boosting > 0) {
+    for (let i = 0; i < 6; i++) {
+      ctx.save();
+      ctx.globalAlpha = 0.3 - i*0.04;
+      ctx.fillStyle = '#ffe600';
+      ctx.shadowColor = '#ffe600';
+      ctx.shadowBlur = 20;
+      ctx.fillRect(x - w/2 + 4, y + h/2 + i*8, w - 8, 6);
+      ctx.restore();
+    }
+  }
+
+  // Car body shadow
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + h/2 + 6, w*0.55, 4, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body — sleek hover-car
+  ctx.shadowColor = '#00f0ff';
+  ctx.shadowBlur = 24;
+  // Main chassis
+  const grad = ctx.createLinearGradient(x - w/2, y, x + w/2, y);
+  grad.addColorStop(0, '#0a0f1f');
+  grad.addColorStop(0.5, '#1a2456');
+  grad.addColorStop(1, '#0a0f1f');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(x, y - h/2);
+  ctx.lineTo(x + w/2, y - h/4);
+  ctx.lineTo(x + w/2 - 4, y + h/2);
+  ctx.lineTo(x - w/2 + 4, y + h/2);
+  ctx.lineTo(x - w/2, y - h/4);
+  ctx.closePath();
+  ctx.fill();
+
+  // Neon outline
+  ctx.strokeStyle = '#00f0ff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Windshield
+  ctx.fillStyle = 'rgba(255,43,214,.35)';
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.moveTo(x - w/3, y - h/6);
+  ctx.lineTo(x + w/3, y - h/6);
+  ctx.lineTo(x + w/4, y + h/8);
+  ctx.lineTo(x - w/4, y + h/8);
+  ctx.closePath();
+  ctx.fill();
+
+  // Headlights
+  ctx.shadowBlur = 16;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x - w/2 + 4, y - h/2 + 4, 6, 4);
+  ctx.fillRect(x + w/2 - 10, y - h/2 + 4, 6, 4);
+
+  // Rear lights
+  ctx.shadowColor = '#ff3b6b';
+  ctx.fillStyle = '#ff3b6b';
+  ctx.fillRect(x - w/2 + 4, y + h/2 - 6, w - 8, 3);
+
+  ctx.restore();
+}
+
+function drawParticles() {
+  G.particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawLives() {
+  ctx.save();
+  for (let i = 0; i < G.car.lives; i++) {
+    ctx.fillStyle = '#ff2bd6';
+    ctx.shadowColor = '#ff2bd6';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(20 + i * 22, H - 24, 7, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function render() {
+  ctx.save();
+  if (shakeTime > 0) {
+    shakeX = (Math.random() - .5) * shakeIntensity;
+    shakeY = (Math.random() - .5) * shakeIntensity;
+    shakeTime -= 1/60;
+    ctx.translate(shakeX, shakeY);
+  }
+
+  drawBackground();
+  drawObstacles();
+  drawPickups();
+  drawCar();
+  drawParticles();
+  drawLives();
+
+  ctx.restore();
+}
+
+/* ----------- HUD update ----------- */
+function updateHUD() {
+  document.getElementById('hud-distance').textContent = Math.floor(G.distance) + 'M';
+  document.getElementById('hud-speed').textContent = Math.floor(G.speed * 20);
+  document.getElementById('hud-score').textContent = G.score.toLocaleString();
+  document.getElementById('hud-leads').textContent = G.leadsTotal;
+  document.getElementById('hud-credits').textContent = Math.floor(G.credits);
+  document.getElementById('leads-fill').style.width = ((G.leads % 10) * 10) + '%';
+}
+
+/* ----------- Game loop ----------- */
+let lastT = 0;
+function loop(t) {
+  const dt = Math.min(0.05, (t - lastT) / 1000);
+  lastT = t;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ============================================================
+   FLOW: start, pause, code, crm, end
+   ============================================================ */
+function startGame() {
+  Audio.init();
+  hideAll();
+  G.state = 'running';
+  G.distance = 0;
+  G.score = 0;
+  G.leads = 0;
+  G.leadsTotal = 0;
+  G.combo = 1;
+  G.comboTimer = 0;
+  G.multiplier = 1;
+  G.multTimer = 0;
+  G.obstacles = [];
+  G.pickups = [];
+  G.particles = [];
+  G.checkpoint = 1;
+  G.challengesCorrect = 0;
+  G.boostCount = 0;
+  G.car.lives = 3;
+  G.car.lane = 1;
+  G.car.invincible = 0;
+  G.car.boosting = 0;
+  G.pendingCRM = false;
+  G.hasFreeSolve = hasModule('ai');
+  G.startTime = Date.now();
+  resize();
+  updateHUD();
+  checkStreak();
+}
+
+function pauseGame() {
+  if (G.state !== 'running') return;
+  G.state = 'paused';
+  show('overlay-pause');
+}
+function resumeGame() {
+  if (G.state !== 'paused') return;
+  hideAll();
+  G.state = 'running';
+}
+
+function openCRM() {
+  G.state = 'crm';
+  document.getElementById('crm-credits').textContent = Math.floor(G.credits);
+  document.getElementById('crm-leads').textContent = G.leadsTotal;
+  document.getElementById('crm-modules').textContent = Object.keys(G.modules).length + '/' + MODULES.length;
+  renderModules();
+  show('overlay-crm');
+}
+
+function renderModules() {
+  const list = document.getElementById('module-list');
+  list.innerHTML = '';
+  MODULES.forEach(m => {
+    const owned = !!G.modules[m.id];
+    const affordable = G.credits >= m.cost * 200;
+    const div = document.createElement('div');
+    div.className = 'module' + (owned ? ' owned' : (!affordable ? ' locked' : ''));
+    div.innerHTML = `
+      <div class="module-cost">${m.cost * 200} CR</div>
+      <div class="module-name">${m['name_' + LANG]}</div>
+      <div class="module-desc">${m['desc_' + LANG]}</div>
+    `;
+    if (!owned && affordable) {
+      div.addEventListener('click', () => {
+        G.credits -= m.cost * 200;
+        G.modules[m.id] = true;
+        Store.set('modules', G.modules);
+        Audio.module();
+        toast(t('toast_module') + ' · ' + m['name_' + LANG], 'cyan');
+        renderModules();
+        document.getElementById('crm-credits').textContent = Math.floor(G.credits);
+        document.getElementById('crm-modules').textContent = Object.keys(G.modules).length + '/' + MODULES.length;
+      });
+    }
+    list.appendChild(div);
+  });
+}
+
+function continueCRM() {
+  hideAll();
+  G.state = 'running';
+  G.pendingCRM = false;
+}
+
+function triggerCodeBreaker() {
+  G.state = 'code';
+  const challenge = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+  document.getElementById('code-question').textContent = challenge['q_' + LANG];
+  document.getElementById('code-block').innerHTML = challenge.code;
+
+  const ansEl = document.getElementById('code-answers');
+  ansEl.innerHTML = '';
+
+  // shuffle answers but track correct
+  const indices = challenge.answers.map((_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  let resolved = false;
+  indices.forEach(origIdx => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = challenge.answers[origIdx];
+    btn.addEventListener('click', () => {
+      if (resolved) return;
+      resolved = true;
+      clearInterval(timerInt);
+      const correct = origIdx === challenge.correct;
+      handleCodeAnswer(correct, btn, indices, challenge.correct);
+    });
+    ansEl.appendChild(btn);
+  });
+
+  // Auto-solve via AI Copilot module
+  if (G.hasFreeSolve) {
+    G.hasFreeSolve = false;
+    setTimeout(() => {
+      if (resolved) return;
+      resolved = true;
+      clearInterval(timerInt);
+      const buttons = Array.from(ansEl.children);
+      const correctBtn = buttons[indices.indexOf(challenge.correct)];
+      toast('🤖 AI COPILOT', 'cyan');
+      handleCodeAnswer(true, correctBtn, indices, challenge.correct);
+    }, 1500);
+  }
+
+  // Timer
+  let timeLeft = 8;
+  const timerFill = document.getElementById('code-timer');
+  timerFill.style.width = '100%';
+  const timerInt = setInterval(() => {
+    timeLeft -= 0.1;
+    timerFill.style.width = (timeLeft / 8 * 100) + '%';
+    if (timeLeft <= 0 && !resolved) {
+      resolved = true;
+      clearInterval(timerInt);
+      handleCodeAnswer(false, null, indices, challenge.correct);
+    }
+  }, 100);
+
+  show('overlay-code');
+}
+
+function handleCodeAnswer(correct, btn, indices, correctIdx) {
+  const ansEl = document.getElementById('code-answers');
+  // Disable all buttons
+  Array.from(ansEl.children).forEach((b, i) => {
+    b.style.pointerEvents = 'none';
+    if (indices[i] === correctIdx) b.classList.add('correct');
+  });
+  if (btn && !correct) btn.classList.add('wrong');
+
+  setTimeout(() => {
+    hideAll();
+    G.state = 'running';
+    if (correct) {
+      G.multiplier = 2;
+      G.multTimer = 15;
+      G.credits += 200;
+      G.score += 500;
+      G.challengesCorrect++;
+      toast(t('toast_correct'), 'yellow');
+      Audio.correct();
+    } else {
+      G.speed = Math.max(2, G.speed * 0.5);
+      G.baseSpeed = Math.max(2, G.baseSpeed * 0.85);
+      setTimeout(() => { G.baseSpeed = 4; }, 3000);
+      toast(t('toast_wrong'), 'magenta');
+      Audio.wrong();
+    }
+  }, 1200);
+}
+
+function gameOver() {
+  G.state = 'gameover';
+
+  // Daily check
+  const daily = getDaily();
+  let dailyCompleted = false;
+  const today = new Date().toDateString();
+  const lastDaily = Store.get('lastDaily', null);
+  if (lastDaily !== today) {
+    let satisfied = false;
+    if (daily.ro.includes('2000m') && G.distance >= 2000 && G.car.lives >= 3) satisfied = true;
+    else if (daily.ro.includes('15 lead') && G.leadsTotal >= 15) satisfied = true;
+    else if (daily.ro.includes('2 challenges') && G.challengesCorrect >= 2) satisfied = true;
+    else if (daily.ro.includes('Combo') && G.combo >= 8) satisfied = true;
+    else if (daily.ro.includes('10000') && G.score >= 10000) satisfied = true;
+    if (satisfied) {
+      G.credits += daily.reward;
+      Store.set('lastDaily', today);
+      dailyCompleted = true;
+      toast('📅 DAILY +' + daily.reward + ' CR', 'yellow');
+    }
+  }
+
+  // Save credits
+  Store.set('credits', G.credits);
+
+  // Add to leaderboard
+  const lb = Store.get('leaderboard', []);
+  lb.push({
+    score: G.score,
+    distance: Math.floor(G.distance),
+    leads: G.leadsTotal,
+    credits: Math.floor(G.credits),
+    date: new Date().toISOString(),
+  });
+  lb.sort((a, b) => b.score - a.score);
+  Store.set('leaderboard', lb.slice(0, 10));
+
+  // Populate end screen
+  document.getElementById('end-dist').textContent = Math.floor(G.distance) + 'M';
+  document.getElementById('end-score').textContent = G.score.toLocaleString();
+  document.getElementById('end-leads').textContent = G.leadsTotal;
+  document.getElementById('end-credits').textContent = Math.floor(G.credits);
+  document.getElementById('end-checkpoints').textContent = G.challengesCorrect;
+  document.getElementById('end-modules').textContent = Object.keys(G.modules).length;
+
+  renderLeaderboard('end-leaderboard', G.score);
+  show('overlay-end');
+}
+
+function renderLeaderboard(elId, highlightScore) {
+  const lb = Store.get('leaderboard', []);
+  const el = document.getElementById(elId);
+  if (lb.length === 0) {
+    el.innerHTML = '<div class="lb-row"><span style="grid-column:1/-1;color:var(--text-2);text-align:center">— ' + (LANG==='ro'?'Niciun run salvat':'No runs yet') + ' —</span></div>';
+    return;
+  }
+  el.innerHTML = lb.slice(0, 8).map((r, i) => {
+    const isYou = r.score === highlightScore && i < 5;
+    const rankClass = i === 0 ? 'gold' : '';
+    return `<div class="lb-row ${isYou?'you':''}">
+      <span class="lb-rank ${rankClass}">#${i+1}</span>
+      <span class="lb-name">${isYou ? (LANG==='ro'?'TU':'YOU') : 'AGENT-' + Math.floor(Math.random()*900+100)}</span>
+      <span class="lb-score">${r.score.toLocaleString()}</span>
+      <span style="color:var(--text-2)">${r.distance}M</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAchievements() {
+  const grid = document.getElementById('ach-grid');
+  grid.innerHTML = ACHIEVEMENTS.map(a => {
+    const isUnlocked = !!unlocked[a.id];
+    return `<div class="ach ${isUnlocked?'unlocked':''}">
+      <div class="ach-icon">${isUnlocked ? a.icon : '🔒'}</div>
+      <div style="font-weight:700;color:${isUnlocked?'var(--neon-yellow)':'var(--text-2)'}">${a['t_'+LANG]}</div>
+      <div style="font-size:10px;margin-top:2px;opacity:.7">${a['desc_'+LANG]}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ----------- Overlay helpers ----------- */
+function hideAll() {
+  document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
+}
+function show(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+/* ============================================================
+   Input
+   ============================================================ */
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (G.state === 'running') {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') G.car.lane = Math.max(0, G.car.lane - 1);
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') G.car.lane = Math.min(2, G.car.lane + 1);
+    if (e.code === 'Space') { e.preventDefault(); if (G.car.boosting <= 0 && G.credits >= 100) { G.car.boosting = hasModule('quantum') ? 10 : 5; G.credits -= 100; G.boostCount++; toast(t('toast_boost'), 'cyan'); Audio.beep(880, .2, 'sawtooth', .8); } }
+    if (e.code === 'KeyP' || e.code === 'Escape') pauseGame();
+  } else if (G.state === 'paused' && (e.code === 'KeyP' || e.code === 'Escape')) {
+    resumeGame();
+  }
+});
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+// Touch
+let touchStartX = null;
+canvas.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, {passive: true});
+canvas.addEventListener('touchend', e => {
+  if (G.state !== 'running' || touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (dx < -30) G.car.lane = Math.max(0, G.car.lane - 1);
+  else if (dx > 30) G.car.lane = Math.min(2, G.car.lane + 1);
+  touchStartX = null;
+}, {passive: true});
+
+// Mobile touch buttons
+document.getElementById('touch-left').addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (G.state === 'running') G.car.lane = Math.max(0, G.car.lane - 1);
+}, {passive: false});
+document.getElementById('touch-right').addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (G.state === 'running') G.car.lane = Math.min(2, G.car.lane + 1);
+}, {passive: false});
+
+// Show touch controls on mobile
+if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+  document.getElementById('touch-controls').classList.add('show');
+}
+
+/* ============================================================
+   Wire up buttons
+   ============================================================ */
+document.getElementById('btn-start').addEventListener('click', () => { Audio.click(); startGame(); });
+document.getElementById('btn-resume').addEventListener('click', () => { Audio.click(); resumeGame(); });
+document.getElementById('btn-quit').addEventListener('click', () => { Audio.click(); gameOver(); });
+document.getElementById('btn-retry').addEventListener('click', () => { Audio.click(); startGame(); });
+document.getElementById('btn-home').addEventListener('click', () => { Audio.click(); hideAll(); G.state = 'menu'; updateDailyBanner(); show('overlay-start'); });
+document.getElementById('btn-crm-continue').addEventListener('click', () => { Audio.click(); continueCRM(); });
+document.getElementById('btn-show-leaderboard').addEventListener('click', () => { Audio.click(); renderLeaderboard('main-leaderboard', null); show('overlay-leaderboard'); });
+document.getElementById('btn-lb-close').addEventListener('click', () => { Audio.click(); hideAll(); show('overlay-start'); });
+document.getElementById('btn-lb-reset').addEventListener('click', () => {
+  if (confirm(LANG==='ro' ? 'Resetează leaderboard-ul?' : 'Reset leaderboard?')) {
+    Store.set('leaderboard', []);
+    renderLeaderboard('main-leaderboard', null);
+  }
+});
+document.getElementById('btn-show-achievements').addEventListener('click', () => { Audio.click(); renderAchievements(); show('overlay-ach'); });
+document.getElementById('btn-ach-close').addEventListener('click', () => { Audio.click(); hideAll(); show('overlay-start'); });
+document.getElementById('btn-pause').addEventListener('click', () => {
+  Audio.click();
+  if (G.state === 'running') pauseGame();
+  else if (G.state === 'paused') resumeGame();
+});
+document.getElementById('btn-lang').addEventListener('click', () => {
+  LANG = LANG === 'ro' ? 'en' : 'ro';
+  Store.set('lang', LANG);
+  localStorage.setItem('nexus.lang', LANG);
+  applyI18n();
+  updateDailyBanner();
+});
+document.getElementById('btn-sound').addEventListener('click', () => { Audio.init(); Audio.toggle(); });
+
+document.getElementById('btn-share').addEventListener('click', () => {
+  const txt = `${t('daily_share')} 🚀\n${LANG==='ro'?'Scor':'Score'}: ${G.score.toLocaleString()} · ${Math.floor(G.distance)}M · ${G.leadsTotal} leads\nhttps://laurandreea10.github.io/nexus-protocol/`;
+  if (navigator.share) {
+    navigator.share({ text: txt }).catch(()=>{});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt);
+    toast(LANG==='ro' ? 'Copiat!' : 'Copied!', 'cyan');
+  }
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================================================
+   Init
+   ============================================================ */
+applyI18n();
+updateDailyBanner();
+checkStreak();
+resize();
+if (Audio.enabled === false) document.getElementById('btn-sound').textContent = '♪̸';
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

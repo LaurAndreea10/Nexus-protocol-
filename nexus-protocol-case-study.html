@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS PROTOCOL · Case Study — Laura Andreea</title>
+<meta name="description" content="Case study NEXUS PROTOCOL — endless runner neon × CRM tycoon × code breaker. Single-file game care leagă portofoliul CRM de zona de jocuri.">
+<meta name="theme-color" content="#071226">
+<meta property="og:title" content="NEXUS PROTOCOL — Case Study">
+<meta property="og:description" content="Trei genuri într-un singur joc single-file. Cum am legat zona CRM de zona arcade din portofoliu.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://laurandreea10.github.io/codepen-portfolio/projects/nexus-protocol.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #071226;
+    --bg-1: #0a172e;
+    --bg-2: #122244;
+    --ink-0: #f4f7ff;
+    --ink-1: #aab3d9;
+    --ink-2: #6b7399;
+    --cyan: #00f0ff;
+    --magenta: #ff2bd6;
+    --violet: #8a3bff;
+    --yellow: #ffe600;
+    --green: #39ff7e;
+    --red: #ff3b6b;
+    --font-display: 'Orbitron', sans-serif;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg-0); color: var(--ink-0); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+  body {
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(138,59,255,.15), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,240,255,.10), transparent 55%),
+      var(--bg-0);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* Top nav */
+  nav.top {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(7,18,38,.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,240,255,.15);
+    padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+  }
+  nav.top a { color: var(--cyan); text-decoration: none; }
+  nav.top a:hover { color: var(--magenta); }
+  .lang-toggle {
+    display: inline-flex; gap: 4px;
+    border: 1px solid rgba(0,240,255,.25); padding: 3px;
+  }
+  .lang-toggle button {
+    background: transparent; border: none; color: var(--ink-2);
+    padding: 4px 10px; cursor: pointer; font-family: var(--font-mono); font-size: 11px;
+  }
+  .lang-toggle button.active { background: var(--cyan); color: var(--bg-0); font-weight: 700; }
+
+  main { max-width: 920px; margin: 0 auto; padding: 0 28px; }
+
+  /* Hero */
+  header.hero { padding: 60px 0 40px; border-bottom: 1px solid rgba(0,240,255,.12); }
+  .tagline {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .25em;
+    color: var(--cyan); text-transform: uppercase; margin-bottom: 14px;
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 6vw, 64px);
+    letter-spacing: .02em; line-height: 1.05;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta) 60%, var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 18px;
+  }
+  .lede { font-size: 18px; color: var(--ink-1); line-height: 1.6; max-width: 720px; }
+
+  .actions { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    color: var(--bg-0); font-family: var(--font-display); font-weight: 700;
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 12px 22px; text-decoration: none; border: none; cursor: pointer;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition: filter .2s, transform .15s;
+  }
+  .btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+  .btn.ghost {
+    background: transparent; color: var(--cyan); border: 1px solid var(--cyan);
+    box-shadow: 0 0 12px rgba(0,240,255,.3);
+  }
+
+  /* Meta strip */
+  .meta-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px; padding: 24px 0; border-bottom: 1px solid rgba(0,240,255,.12);
+  }
+  .meta-cell { padding: 8px 0; }
+  .meta-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em;
+    color: var(--ink-2); text-transform: uppercase; margin-bottom: 4px;
+  }
+  .meta-value { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--ink-0); }
+  .meta-value.cyan { color: var(--cyan); }
+  .meta-value.magenta { color: var(--magenta); }
+  .meta-value.yellow { color: var(--yellow); }
+
+  /* Sections */
+  section { padding: 48px 0; border-bottom: 1px solid rgba(0,240,255,.08); }
+  section:last-of-type { border-bottom: none; }
+  h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: 28px;
+    color: var(--cyan); margin-bottom: 8px; letter-spacing: .02em;
+  }
+  .section-sub {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em;
+    color: var(--ink-2); text-transform: uppercase; margin-bottom: 22px;
+  }
+  p { color: var(--ink-1); font-size: 16px; line-height: 1.7; margin-bottom: 16px; }
+  p b { color: var(--ink-0); font-weight: 600; }
+  p code, .code-inline {
+    font-family: var(--font-mono); font-size: 14px; background: rgba(0,240,255,.08);
+    border: 1px solid rgba(0,240,255,.2); padding: 1px 6px; color: var(--cyan);
+  }
+
+  /* Problem / Solution boxes */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+  .box {
+    border: 1px solid rgba(0,240,255,.2);
+    background: linear-gradient(135deg, rgba(0,240,255,.04), rgba(255,43,214,.04));
+    padding: 22px;
+  }
+  .box.problem { border-color: rgba(255,59,107,.3); }
+  .box.problem .box-label { color: var(--red); }
+  .box.solution { border-color: rgba(57,255,126,.3); }
+  .box.solution .box-label { color: var(--green); }
+  .box-label {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em;
+    color: var(--cyan); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .box h3 { font-family: var(--font-display); font-size: 16px; color: var(--ink-0); margin-bottom: 10px; }
+  .box p { font-size: 14px; margin-bottom: 0; }
+
+  /* Layer cards */
+  .layers { display: grid; gap: 18px; margin: 22px 0; }
+  .layer {
+    border: 1px solid rgba(0,240,255,.2);
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(10,23,46,.6), rgba(7,18,38,.6));
+    position: relative; overflow: hidden;
+  }
+  .layer::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--cyan);
+  }
+  .layer.magenta::before { background: var(--magenta); }
+  .layer.yellow::before { background: var(--yellow); }
+  .layer-num {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .25em;
+    color: var(--ink-2); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .layer h3 {
+    font-family: var(--font-display); font-size: 22px; color: var(--ink-0);
+    margin-bottom: 10px; letter-spacing: .02em;
+  }
+  .layer.magenta h3 { color: var(--magenta); }
+  .layer.yellow h3 { color: var(--yellow); }
+  .layer.cyan h3 { color: var(--cyan); }
+  .layer p { margin-bottom: 0; font-size: 15px; }
+
+  /* Module table */
+  .modules-table {
+    margin: 18px 0; border: 1px solid rgba(0,240,255,.15);
+    font-family: var(--font-mono); font-size: 13px;
+  }
+  .mod-row {
+    display: grid; grid-template-columns: 1.5fr 0.7fr 2fr;
+    gap: 14px; padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,240,255,.08);
+    align-items: center;
+  }
+  .mod-row:last-child { border-bottom: none; }
+  .mod-row.header {
+    background: rgba(0,240,255,.05);
+    font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .mod-name { color: var(--magenta); font-weight: 500; }
+  .mod-cost { color: var(--yellow); }
+  .mod-effect { color: var(--ink-1); font-family: var(--font-ui); font-size: 14px; }
+  @media (max-width: 640px) {
+    .mod-row { grid-template-columns: 1fr; gap: 4px; }
+    .mod-row.header { display: none; }
+  }
+
+  /* Decision log */
+  .decision {
+    border-left: 2px solid var(--cyan); padding: 14px 0 14px 20px; margin-bottom: 22px;
+  }
+  .decision.magenta { border-color: var(--magenta); }
+  .decision.yellow { border-color: var(--yellow); }
+  .decision h4 {
+    font-family: var(--font-display); font-size: 15px; color: var(--ink-0);
+    margin-bottom: 8px; letter-spacing: .02em;
+  }
+  .decision .alt {
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-2);
+    margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(0,240,255,.15);
+  }
+
+  /* CTA */
+  .cta {
+    margin: 60px 0 0; padding: 40px;
+    border: 1px solid rgba(0,240,255,.3);
+    background: linear-gradient(135deg, rgba(0,240,255,.04), rgba(255,43,214,.04));
+    text-align: center;
+  }
+  .cta h2 { color: var(--ink-0); margin-bottom: 14px; }
+
+  /* Lang toggle behavior */
+  .lang-en { display: none; }
+  body.en .lang-ro { display: none; }
+  body.en .lang-en { display: revert; }
+
+  footer.bottom {
+    text-align: center; padding: 30px 20px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-2);
+    letter-spacing: .1em;
+  }
+  footer.bottom a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+<nav class="top">
+  <a href="../index.html">◀ <span class="lang-ro">Portofoliu</span><span class="lang-en">Portfolio</span></a>
+  <div class="lang-toggle">
+    <button class="active" data-lang="ro">RO</button>
+    <button data-lang="en">EN</button>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="tagline lang-ro">// CASE STUDY · GAME × CRM × CODE</div>
+    <div class="tagline lang-en">// CASE STUDY · GAME × CRM × CODE</div>
+    <h1>NEXUS PROTOCOL</h1>
+    <p class="lede lang-ro">Un experiment de fuziune: endless runner synthwave + CRM tycoon meta-layer + code breaker checkpoint-uri. Construit într-un singur fișier HTML pentru a demonstra că aceleași principii de design care fac un CRM bun fac și un joc bun.</p>
+    <p class="lede lang-en">A fusion experiment: synthwave endless runner + CRM tycoon meta-layer + code breaker checkpoints. Built in a single HTML file to show that the same design principles that make a good CRM also make a good game.</p>
+
+    <div class="actions">
+      <a class="btn" href="https://laurandreea10.github.io/nexus-protocol/" target="_blank" rel="noopener">▶ <span class="lang-ro">Joacă acum</span><span class="lang-en">Play now</span></a>
+      <a class="btn ghost" href="https://github.com/LaurAndreea10/nexus-protocol" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+
+  <!-- META STRIP -->
+  <div class="meta-strip">
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Stack</div>
+      <div class="meta-label lang-en">Stack</div>
+      <div class="meta-value cyan">Vanilla JS</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Render</div>
+      <div class="meta-label lang-en">Render</div>
+      <div class="meta-value">Canvas 2D</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Dimensiune</div>
+      <div class="meta-label lang-en">Size</div>
+      <div class="meta-value yellow">74 KB</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Linii cod</div>
+      <div class="meta-label lang-en">Lines</div>
+      <div class="meta-value">~2100</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Limbi</div>
+      <div class="meta-label lang-en">Languages</div>
+      <div class="meta-value magenta">RO · EN</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label lang-ro">Dependențe</div>
+      <div class="meta-label lang-en">Dependencies</div>
+      <div class="meta-value">0</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section>
+    <h2 class="lang-ro">Punctul de pornire</h2>
+    <h2 class="lang-en">Starting point</h2>
+    <div class="section-sub lang-ro">// PROBLEMA & SOLUȚIA</div>
+    <div class="section-sub lang-en">// PROBLEM & SOLUTION</div>
+
+    <div class="grid-2">
+      <div class="box problem">
+        <div class="box-label">Problem</div>
+        <h3 class="lang-ro">Două portofolii paralele</h3>
+        <h3 class="lang-en">Two parallel portfolios</h3>
+        <p class="lang-ro">Aveam zona CRM (Alpis Fusion, ClientFlow, ClientOps) și zona arcade (ARCADE OPS, BASKET VS AI, NEXUS ARCADE) — bine construite separat, dar fără un proiect care să le conecteze. Recruiterii care intrau pe CRM nu vedeau abilitățile de game design și invers.</p>
+        <p class="lang-en">I had the CRM area (Alpis Fusion, ClientFlow, ClientOps) and the arcade area (ARCADE OPS, BASKET VS AI, NEXUS ARCADE) — both built well separately, but no project bridging them. Recruiters landing on CRM didn't see the game design skills and vice versa.</p>
+      </div>
+      <div class="box solution">
+        <div class="box-label">Solution</div>
+        <h3 class="lang-ro">Un singur proiect cu trei layere</h3>
+        <h3 class="lang-en">One project, three layers</h3>
+        <p class="lang-ro">NEXUS PROTOCOL pune un endless runner ca shell, un CRM tycoon ca meta-layer și mini-challenges de cod la checkpoint-uri. Modulele CRM nu sunt cosmetice — fiecare schimbă observabil regulile run-ului.</p>
+        <p class="lang-en">NEXUS PROTOCOL puts an endless runner as the shell, a CRM tycoon as meta-layer, and code mini-challenges at checkpoints. CRM modules aren't cosmetic — each observably changes run rules.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYERS -->
+  <section>
+    <h2 class="lang-ro">Trei layere, un singur drum</h2>
+    <h2 class="lang-en">Three layers, one road</h2>
+    <div class="section-sub lang-ro">// ARHITECTURĂ DE GAMEPLAY</div>
+    <div class="section-sub lang-en">// GAMEPLAY ARCHITECTURE</div>
+
+    <div class="layers">
+      <div class="layer cyan">
+        <div class="layer-num">LAYER 01 · DRIVE</div>
+        <h3 class="lang-ro">Endless runner synthwave</h3>
+        <h3 class="lang-en">Synthwave endless runner</h3>
+        <p class="lang-ro">Trei lane-uri, perspectivă falsă cu soare retro + grid scrolling, obstacole holografice (block / spike), pickup-uri de tip lead, energy și boost. Speed ramp progresiv: 4 → 14 unități pe măsură ce avansezi.</p>
+        <p class="lang-en">Three lanes, fake perspective with retro sun + grid scrolling, holographic obstacles (block / spike), pickups for leads, energy and boost. Progressive speed ramp: 4 → 14 units as you advance.</p>
+      </div>
+
+      <div class="layer magenta">
+        <div class="layer-num">LAYER 02 · CRM</div>
+        <h3 class="lang-ro">Module store între run-uri</h3>
+        <h3 class="lang-en">Module store between runs</h3>
+        <p class="lang-ro">La fiecare 10 lead-uri închise se deschide CRM Module Store. Cumperi module cu credite acumulate. Modulele persistă între run-uri și fiecare schimbă o regulă concretă (vezi tabel mai jos).</p>
+        <p class="lang-en">Every 10 closed leads opens the CRM Module Store. You buy modules with accumulated credits. Modules persist between runs and each changes one concrete rule (see table below).</p>
+      </div>
+
+      <div class="layer yellow">
+        <div class="layer-num">LAYER 03 · CODE</div>
+        <h3 class="lang-ro">Checkpoint-uri cu cod real</h3>
+        <h3 class="lang-en">Checkpoints with real code</h3>
+        <p class="lang-ro">La fiecare 1000m apare un Code Breaker: <code>typeof null</code>, <code>[10,1,2].sort()</code>, <code>0.1+0.2 === 0.3</code>, regex, CSS specificity. 8 secunde, 4 răspunsuri. Corect → multiplier ×2 timp de 15s. Greșit → slowdown 3s. Diferențiator clar față de alte runner-e.</p>
+        <p class="lang-en">Every 1000m a Code Breaker appears: <code>typeof null</code>, <code>[10,1,2].sort()</code>, <code>0.1+0.2 === 0.3</code>, regex, CSS specificity. 8 seconds, 4 answers. Right → ×2 multiplier for 15s. Wrong → 3s slowdown. Clear differentiator vs other runners.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULES TABLE -->
+  <section>
+    <h2 class="lang-ro">8 module CRM care schimbă regulile</h2>
+    <h2 class="lang-en">8 CRM modules that change rules</h2>
+    <div class="section-sub lang-ro">// EFECTE PERMANENTE</div>
+    <div class="section-sub lang-en">// PERMANENT EFFECTS</div>
+
+    <p class="lang-ro">Fiecare modul preia un concept din Alpis Fusion CRM Premium și îl traduce în mecanică de joc. Numele sunt identice cu cele din portofoliul meu CRM — același vocabular, alt mediu.</p>
+    <p class="lang-en">Each module takes a concept from Alpis Fusion CRM Premium and translates it into game mechanics. Names are identical to those from my CRM portfolio — same vocabulary, different medium.</p>
+
+    <div class="modules-table">
+      <div class="mod-row header">
+        <div><span class="lang-ro">Modul</span><span class="lang-en">Module</span></div>
+        <div><span class="lang-ro">Cost</span><span class="lang-en">Cost</span></div>
+        <div><span class="lang-ro">Efect în joc</span><span class="lang-en">In-game effect</span></div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">KANBAN</div>
+        <div class="mod-cost">200 CR</div>
+        <div class="mod-effect lang-ro">+10% credite din lead-uri</div>
+        <div class="mod-effect lang-en">+10% credits from leads</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">AUTOSAVE</div>
+        <div class="mod-cost">400 CR</div>
+        <div class="mod-effect lang-ro">50% șansă să nu pierzi viață la crash</div>
+        <div class="mod-effect lang-en">50% chance to keep your life on crash</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">RBAC</div>
+        <div class="mod-cost">400 CR</div>
+        <div class="mod-effect lang-ro">Combo nu se mai pierde la coliziune</div>
+        <div class="mod-effect lang-en">Combo no longer resets on collision</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">FLOW BUILDER</div>
+        <div class="mod-cost">600 CR</div>
+        <div class="mod-effect lang-ro">Energy capsules dau și +1 lead</div>
+        <div class="mod-effect lang-en">Energy capsules also give +1 lead</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">BILLING</div>
+        <div class="mod-cost">600 CR</div>
+        <div class="mod-effect lang-ro">+25% credite din lead-uri</div>
+        <div class="mod-effect lang-en">+25% credits from leads</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">BOOKING</div>
+        <div class="mod-cost">800 CR</div>
+        <div class="mod-effect lang-ro">Magnet — lead-urile sunt atrase spre tine</div>
+        <div class="mod-effect lang-en">Magnet — leads are attracted to you</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">AI COPILOT</div>
+        <div class="mod-cost">1000 CR</div>
+        <div class="mod-effect lang-ro">Auto-solve la 1 challenge / run</div>
+        <div class="mod-effect lang-en">Auto-solve 1 challenge / run</div>
+      </div>
+      <div class="mod-row">
+        <div class="mod-name">QUANTUM CORE</div>
+        <div class="mod-cost">1400 CR</div>
+        <div class="mod-effect lang-ro">Boost durează ×2 (10s în loc de 5s)</div>
+        <div class="mod-effect lang-en">Boost lasts ×2 (10s instead of 5s)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISION LOG -->
+  <section>
+    <h2 class="lang-ro">Decision Log</h2>
+    <h2 class="lang-en">Decision Log</h2>
+    <div class="section-sub lang-ro">// DECIZII TEHNICE & ALTERNATIVE CONSIDERATE</div>
+    <div class="section-sub lang-en">// TECH DECISIONS & ALTERNATIVES CONSIDERED</div>
+
+    <div class="decision">
+      <h4 class="lang-ro">1. Single-file delivery vs Vite + React</h4>
+      <h4 class="lang-en">1. Single-file delivery vs Vite + React</h4>
+      <p class="lang-ro">Am ales <b>single-file HTML</b> (74KB) pentru consistență cu ARCADE OPS și BASKET VS AI. Deploy într-un push, fără build pipeline, recruiterul poate citi tot codul într-un singur fișier.</p>
+      <p class="lang-en">I chose <b>single-file HTML</b> (74KB) for consistency with ARCADE OPS and BASKET VS AI. Deploy in one push, no build pipeline, recruiters can read the entire codebase in one file.</p>
+      <div class="alt lang-ro">Alternativă: Vite + React modular ca Alpis Fusion. Respins pentru că adăuga 30+ fișiere fără câștig funcțional.</div>
+      <div class="alt lang-en">Alternative: Vite + React modular like Alpis Fusion. Rejected because it added 30+ files without functional gain.</div>
+    </div>
+
+    <div class="decision magenta">
+      <h4 class="lang-ro">2. Canvas 2D vs WebGL/Three.js</h4>
+      <h4 class="lang-en">2. Canvas 2D vs WebGL/Three.js</h4>
+      <p class="lang-ro">Estetica synthwave funcționează cu efecte 2D + perspectivă falsă (vertical lines spre punct de fugă). <b>Canvas 2D</b> îmi dă control complet pe glow și particle effects fără shader-e.</p>
+      <p class="lang-en">Synthwave aesthetic works with 2D effects + fake perspective (vertical lines to vanishing point). <b>Canvas 2D</b> gives me full control over glow and particle effects without shaders.</p>
+      <div class="alt lang-ro">Alternativă: Three.js cu road mesh real. Respins — adăuga 600KB și un nivel de complexitate disproporționat.</div>
+      <div class="alt lang-en">Alternative: Three.js with real road mesh. Rejected — added 600KB and a disproportionate complexity level.</div>
+    </div>
+
+    <div class="decision yellow">
+      <h4 class="lang-ro">3. Web Audio procedural vs fișiere .mp3</h4>
+      <h4 class="lang-en">3. Procedural Web Audio vs .mp3 files</h4>
+      <p class="lang-ro">Toate sunetele generate live: lead pickup = sine 880Hz → 1320Hz, crash = sawtooth 80Hz, correct answer = arpeggio C-E-G. <b>Zero asset-uri audio</b> înseamnă repo sub 100KB.</p>
+      <p class="lang-en">All sounds generated live: lead pickup = sine 880Hz → 1320Hz, crash = sawtooth 80Hz, correct answer = C-E-G arpeggio. <b>Zero audio assets</b> means repo under 100KB.</p>
+      <div class="alt lang-ro">Alternativă: librărie de SFX free. Respins pentru că adăuga 800KB+ și constraint-uri de licență.</div>
+      <div class="alt lang-en">Alternative: free SFX library. Rejected because it added 800KB+ and licensing constraints.</div>
+    </div>
+
+    <div class="decision">
+      <h4 class="lang-ro">4. Numele modulelor — identice cu Alpis Fusion</h4>
+      <h4 class="lang-en">4. Module names — identical to Alpis Fusion</h4>
+      <p class="lang-ro">KANBAN, RBAC, FLOW BUILDER, BILLING — am păstrat <b>același vocabular</b> ca în CRM-ul meu real. Pentru recruiterul tehnic, conectarea e instantă: aceleași concepte aplicate în context diferit.</p>
+      <p class="lang-en">KANBAN, RBAC, FLOW BUILDER, BILLING — I kept the <b>same vocabulary</b> as my real CRM. For technical recruiters, the connection is instant: same concepts applied in a different context.</p>
+      <div class="alt lang-ro">Alternativă: nume neutre game-ish (Turbo, Shield, Magnet). Respins — ar fi rupt legătura tematică între portofolii.</div>
+      <div class="alt lang-en">Alternative: neutral game-ish names (Turbo, Shield, Magnet). Rejected — would have broken the thematic link between portfolios.</div>
+    </div>
+
+    <div class="decision magenta">
+      <h4 class="lang-ro">5. localStorage vs backend pentru leaderboard</h4>
+      <h4 class="lang-en">5. localStorage vs backend for leaderboard</h4>
+      <p class="lang-ro"><b>localStorage</b> = zero costuri hosting, match perfect cu portofoliul. Trade-off: nu există competiție globală, dar adaug AGENT-XXX pseudo-entries pentru atmosferă.</p>
+      <p class="lang-en"><b>localStorage</b> = zero hosting cost, perfect match with the portfolio. Trade-off: no global competition, but I add AGENT-XXX pseudo-entries for atmosphere.</p>
+      <div class="alt lang-ro">Alternativă: Firebase / Supabase free tier. Respins pentru complexitate operațională și costuri viitoare.</div>
+      <div class="alt lang-en">Alternative: Firebase / Supabase free tier. Rejected for operational complexity and future costs.</div>
+    </div>
+
+    <div class="decision yellow">
+      <h4 class="lang-ro">6. Bilingv RO/EN cu toggle live</h4>
+      <h4 class="lang-en">6. Bilingual RO/EN with live toggle</h4>
+      <p class="lang-ro">Toate string-urile UI într-un dicționar I18N central. Toggle live fără reload. Limba e salvată în <code>localStorage</code> — vine acasă la următoarea vizită.</p>
+      <p class="lang-en">All UI strings in a central I18N dictionary. Live toggle without reload. Language is saved to <code>localStorage</code> — comes back on next visit.</p>
+      <div class="alt lang-ro">Alternativă: doar EN. Respins — bilingv RO/EN e parte din identitatea portofoliului meu.</div>
+      <div class="alt lang-en">Alternative: EN only. Rejected — bilingual RO/EN is part of my portfolio identity.</div>
+    </div>
+  </section>
+
+  <!-- LESSONS -->
+  <section>
+    <h2 class="lang-ro">Ce am învățat construind asta</h2>
+    <h2 class="lang-en">What I learned building this</h2>
+    <div class="section-sub lang-ro">// LESSONS</div>
+    <div class="section-sub lang-en">// LESSONS</div>
+
+    <p class="lang-ro"><b>1. Vocabularul contează mai mult decât mecanica.</b> Faptul că modulele se numesc KANBAN și BILLING — nu Turbo și Shield — schimbă complet narativul proiectului. Aceleași 5 linii de cod, alt mesaj către recruiter.</p>
+    <p class="lang-en"><b>1. Vocabulary matters more than mechanics.</b> The fact that modules are called KANBAN and BILLING — not Turbo and Shield — completely changes the project's narrative. Same 5 lines of code, different message to recruiters.</p>
+
+    <p class="lang-ro"><b>2. Code breaker e cel mai eficient diferențiator.</b> Endless runners există mii. CRM tycoons sunt rari. Endless runner + CRM + întrebări reale de JavaScript = un singur produs în care fiecare alegere de design spune ceva despre cine sunt ca developer.</p>
+    <p class="lang-en"><b>2. Code breaker is the most efficient differentiator.</b> Endless runners are thousands. CRM tycoons are rare. Endless runner + CRM + real JavaScript questions = one product where every design choice says something about who I am as a developer.</p>
+
+    <p class="lang-ro"><b>3. Procedural audio merită investiția.</b> Web Audio API e mai accesibil decât pare. Patru ore investite în sound design procedural au eliminat permanent dependența de fișiere audio din toate proiectele mele viitoare cu jocuri.</p>
+    <p class="lang-en"><b>3. Procedural audio is worth the investment.</b> Web Audio API is more accessible than it seems. Four hours invested in procedural sound design permanently eliminated my dependency on audio files for all future game projects.</p>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2 class="lang-ro">Vrei să vezi cum gândesc produsul?</h2>
+    <h2 class="lang-en">Want to see how I think product?</h2>
+    <p class="lang-ro">NEXUS PROTOCOL e un experiment — dar abordarea (claritate, layering, vocabular consistent, decision log) e identică cu felul în care construiesc CRM-uri și dashboard-uri reale.</p>
+    <p class="lang-en">NEXUS PROTOCOL is an experiment — but the approach (clarity, layering, consistent vocabulary, decision log) is identical to how I build real CRMs and dashboards.</p>
+    <div class="actions" style="justify-content:center;margin-top:20px">
+      <a class="btn" href="https://laurandreea10.github.io/nexus-protocol/" target="_blank" rel="noopener">▶ <span class="lang-ro">Joacă acum</span><span class="lang-en">Play now</span></a>
+      <a class="btn ghost" href="mailto:andreealaurap@gmail.com?subject=Propunere%20proiect">✉ <span class="lang-ro">Scrie-mi</span><span class="lang-en">Email me</span></a>
+    </div>
+  </div>
+</main>
+
+<footer class="bottom">
+  © 2026 Laura Andreea · <a href="../index.html">laurandreea10.github.io</a>
+</footer>
+
+<script>
+  // Lang toggle
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      document.body.classList.toggle('en', lang === 'en');
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+      try { localStorage.setItem('nexus.case.lang', lang); } catch {}
+    });
+  });
+  // Restore lang
+  try {
+    const saved = localStorage.getItem('nexus.case.lang');
+    if (saved === 'en') document.querySelector('.lang-toggle button[data-lang="en"]').click();
+  } catch {}
+</script>
+</body>
+</html>

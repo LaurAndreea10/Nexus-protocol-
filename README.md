@@ -2,7 +2,7 @@
 
 > Endless runner neon × CRM tycoon × Code breaker. Single-file game by Laura Andreea.
 
-[🎮 Live Demo](https://laurandreea10.github.io/nexus-protocol/) · [📖 Case Study](https://laurandreea10.github.io/codepen-portfolio/projects/nexus-protocol.html) · [🇬🇧 English](#english)
+[🎮 Live Demo](https://laurandreea10.github.io/nexus-protocol/) · [🚀 Versiune extinsă / Extended Edition](https://laurandreea10.github.io/Nexus-protocol-/enhanced.html) · [📖 Case Study](https://laurandreea10.github.io/codepen-portfolio/projects/nexus-protocol.html) · [🇬🇧 English](#english)
 
 ---
 
@@ -13,6 +13,10 @@
 **NEXUS PROTOCOL** este un experiment de fuziune între trei genuri într-un singur joc single-file: un endless runner neon synthwave, un CRM tycoon meta-layer și mini-challenges de cod la checkpoint-uri.
 
 Conduci un hover-car prin sectorul comercial al unui oraș-rețea din 2087. Eviți obstacole holografice, prinzi lead-uri (pickup-uri magenta) și energy capsules. La fiecare 10 lead-uri închise se deschide **CRM Module Store** unde activezi permanent module care îți schimbă regulile run-ului. La fiecare 1000m apare un **Code Breaker checkpoint** cu o întrebare reală despre JavaScript, regex sau CSS — corect → multiplier ×2, greșit → slowdown 3s.
+
+### Versiune extinsă
+
+Am adăugat o variantă extinsă, separată de demo-ul principal, disponibilă în [`enhanced.html`](https://laurandreea10.github.io/Nexus-protocol-/enhanced.html). Această ediție este gândită ca o prezentare mai premium pentru portofoliu: interfață neon/glassmorphism, controale de accesibilitate, RO/EN, dark/light mode, high contrast, reduce motion, Canvas runner playable, CRM Module Store, Code Breaker și progres salvat local.
 
 ### De ce am construit asta
 
@@ -26,6 +30,7 @@ Voiam să leg explicit zona mea de **CRM/SaaS** de zona de **jocuri arcade** din
 - **localStorage** — persistență credite, module, leaderboard, achievements, daily streak
 - **CSS clip-path + glow** — UI cyberpunk fără SVG-uri sau imagini
 - **Single-file delivery** — 74KB, deploy într-un push pe GitHub Pages
+- **Extended single-file edition** — `enhanced.html`, pagină separată pentru prezentare premium și accesibilitate
 
 ### Mecanici cheie
 
@@ -79,6 +84,10 @@ Voiam să leg explicit zona mea de **CRM/SaaS** de zona de **jocuri arcade** din
 
 You drive a hover-car through the commercial sector of a 2087 network-city. You dodge holographic obstacles, grab leads (magenta pickups) and energy capsules. Every 10 closed leads unlocks the **CRM Module Store** where you permanently activate modules that change run rules. Every 1000m a **Code Breaker checkpoint** appears with a real JavaScript/regex/CSS question — right → ×2 multiplier, wrong → 3s slowdown.
 
+### Extended Edition
+
+I added an extended standalone version in [`enhanced.html`](https://laurandreea10.github.io/Nexus-protocol-/enhanced.html). This edition is designed as a stronger portfolio presentation: neon/glassmorphism UI, accessibility controls, RO/EN language switch, dark/light mode, high contrast, reduce motion, playable Canvas runner, CRM Module Store, Code Breaker and local progress persistence.
+
 ### Why I built this
 
 I wanted to explicitly bridge my **CRM/SaaS** portfolio area with the **arcade game** area in a single product showing that the same design principles (kanban, flow builder, RBAC, autosave, billing) can be translated into game mechanics. The CRM Store modules are not decorative — each one changes game behavior observably.
@@ -91,6 +100,7 @@ I wanted to explicitly bridge my **CRM/SaaS** portfolio area with the **arcade g
 - **localStorage** — persists credits, modules, leaderboard, achievements, daily streak
 - **CSS clip-path + glow** — cyberpunk UI without SVGs or images
 - **Single-file delivery** — 74KB, deploys in one GitHub Pages push
+- **Extended single-file edition** — `enhanced.html`, standalone premium/a11y presentation page
 
 ### Controls
 
@@ -106,7 +116,7 @@ I wanted to explicitly bridge my **CRM/SaaS** portfolio area with the **arcade g
 
 **Why Canvas 2D over WebGL?** Synthwave aesthetic works perfectly with 2D + fake perspective (vertical lines to vanishing point + grid scrolling). WebGL would have added 300KB+ and complexity without proportional visual gain.
 
-**Why localStorage for leaderboard?** Single-player, no backend → perfect match for portfolio (zero hosting cost). Trade-off: no global competition, but I add pseudo-AGENT entries for atmosphere.
+**Why localStorage for leaderboard?** Single-player, no backend → perfect match with portfolio constraints: zero hosting cost and no backend. Trade-off: no global competition, but pseudo-AGENT entries keep the atmosphere.
 
 **Why procedural Web Audio?** Zero audio assets = cleaner repo, under 100KB total. All sounds generated live: lead pickup = sine 880Hz → 1320Hz, crash = sawtooth 80Hz, correct answer = C-E-G arpeggio.
 
@@ -122,13 +132,16 @@ cd nexus-protocol
 # Open locally
 open index.html
 
+# Open extended version locally
+open enhanced.html
+
 # Deploy: push to main, enable GitHub Pages → main branch / root
 git push origin main
 ```
 
 ## Tags
 
-`canvas` `web-audio-api` `synthwave` `endless-runner` `crm` `gamification` `bilingual` `single-file` `vanilla-js`
+`canvas` `web-audio-api` `synthwave` `endless-runner` `crm` `gamification` `bilingual` `single-file` `vanilla-js` `accessibility` `github-pages`
 
 ---
 

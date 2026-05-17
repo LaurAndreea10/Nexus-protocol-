@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NEXUS PROTOCOL v2 — Cyberpunk endless runner + CRM tycoon + code breaker + 6 facțiuni + 12 capitole story + AI Director + Prestige. Single-file game by Laura Andreea.">
+<meta name="theme-color" content="#05070f">
+<meta property="og:title" content="NEXUS PROTOCOL v2 — Operative Network">
+<title>NEXUS PROTOCOL · Operative Network v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg-0:#05070f;--bg-1:#0a0f1f;--bg-2:#111835;--cy:#00f0ff;--mg:#ff2bd6;--vt:#8a3bff;--yl:#ffe600;--gn:#39ff7e;--rd:#ff3b6b;--or:#ff8c1a;--t0:#f4f7ff;--t1:#aab3d9;--t2:#6b7399;--t3:#4a5278;--gC:0 0 12px rgba(0,240,255,.6),0 0 32px rgba(0,240,255,.25);--gM:0 0 12px rgba(255,43,214,.6),0 0 32px rgba(255,43,214,.25);--gY:0 0 12px rgba(255,230,0,.6),0 0 32px rgba(255,230,0,.25);--gG:0 0 12px rgba(57,255,126,.55),0 0 28px rgba(57,255,126,.22);--gV:0 0 12px rgba(138,59,255,.6),0 0 32px rgba(138,59,255,.25);--fD:'Orbitron',sans-serif;--fU:'Rajdhani',sans-serif;--fM:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg-0);color:var(--t0);font-family:var(--fU);-webkit-font-smoothing:antialiased;user-select:none}
+body{display:grid;place-items:center;background:radial-gradient(ellipse at 20% 0%,rgba(138,59,255,.18),transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(0,240,255,.12),transparent 55%),radial-gradient(ellipse at 50% 50%,rgba(255,43,214,.08),transparent 60%),var(--bg-0)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.04;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+.scanlines::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 2px,transparent 2px 4px);z-index:2}
+#game-frame{position:relative;width:min(100vw,1280px);height:min(100vh,840px);aspect-ratio:3/2;background:var(--bg-1);border:1px solid rgba(0,240,255,.2);box-shadow:0 0 0 1px rgba(255,43,214,.15),0 0 60px rgba(0,240,255,.18),inset 0 0 120px rgba(0,0,0,.5);overflow:hidden}
+#game-frame::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.4) 100%);z-index:4}
+canvas#game{display:block;width:100%;height:100%;background:linear-gradient(to bottom,#0a0f1f 0%,#1a0a2e 55%,#2b0d3a 100%)}
+#hud{position:absolute;inset:0;pointer-events:none;z-index:5;padding:14px 18px;display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:auto 1fr auto;gap:8px;font-family:var(--fM)}
+.hc{background:linear-gradient(180deg,rgba(10,15,31,.85),rgba(10,15,31,.55));border:1px solid rgba(0,240,255,.3);padding:6px 10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.hc.r{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.hl{font-size:9px;letter-spacing:.18em;color:var(--cy);text-transform:uppercase;opacity:.85}
+.hv{font-family:var(--fD);font-weight:700;font-size:16px;color:var(--t0);text-shadow:var(--gC);line-height:1;margin-top:2px}
+.hv.m{color:var(--mg);text-shadow:var(--gM)}.hv.y{color:var(--yl);text-shadow:var(--gY)}.hv.g{color:var(--gn);text-shadow:var(--gG)}.hv.v{color:var(--vt);text-shadow:var(--gV)}.hv.o{color:var(--or)}
+#hud-tl{grid-column:1;grid-row:1;display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+#hud-tc{grid-column:2;grid-row:1;text-align:center}
+#hud-tr{grid-column:3;grid-row:1;display:flex;gap:6px;justify-content:flex-end;align-items:flex-start;flex-wrap:wrap}
+.pb{height:5px;width:110px;background:rgba(255,255,255,.08);border:1px solid rgba(255,43,214,.3);overflow:hidden;margin-top:3px}
+.pbf{height:100%;background:linear-gradient(90deg,var(--mg),var(--vt));box-shadow:0 0 6px var(--mg);transition:width .25s}
+.pbf.h{background:linear-gradient(90deg,var(--yl),var(--or),var(--rd));box-shadow:0 0 6px var(--or)}
+#faction-bar{position:absolute;top:52px;left:14px;background:rgba(10,15,31,.75);border:1px solid rgba(0,240,255,.2);padding:6px 10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:var(--fM);font-size:10px;z-index:5;display:none}
+#faction-bar.show{display:block}
+.fr-t{color:var(--cy);font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.fr{display:flex;align-items:center;gap:6px;padding:2px 0}
+.fd{width:7px;height:7px;border-radius:50%}
+.fn{color:var(--t1);width:60px;font-size:9px}
+.rb{width:48px;height:4px;background:rgba(255,255,255,.08);position:relative}
+.rbf{height:100%}
+.rb0{position:absolute;left:50%;top:-1px;width:1px;height:6px;background:var(--t3)}
+#combo{position:absolute;top:50%;right:24px;transform:translateY(-50%);font-family:var(--fD);font-weight:900;font-size:54px;color:var(--yl);text-shadow:var(--gY);opacity:0;transition:opacity .3s;pointer-events:none;z-index:6}
+#combo.on{opacity:1}
+#combo.huge{font-size:84px;color:var(--mg);text-shadow:var(--gM);animation:ch .6s ease}
+@keyframes ch{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.2)}}
+#toasts{position:absolute;top:68px;left:50%;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.toast{background:linear-gradient(135deg,rgba(10,15,31,.95),rgba(26,36,86,.85));border:1px solid rgba(57,255,126,.5);color:var(--gn);padding:8px 18px;font-family:var(--fM);font-size:11px;letter-spacing:.08em;text-transform:uppercase;box-shadow:var(--gG);animation:tIn .4s ease,tOut .4s ease 2.6s forwards;white-space:nowrap}
+.toast.m{border-color:rgba(255,43,214,.5);color:var(--mg);box-shadow:var(--gM)}
+.toast.c{border-color:rgba(0,240,255,.5);color:var(--cy);box-shadow:var(--gC)}
+.toast.y{border-color:rgba(255,230,0,.5);color:var(--yl);box-shadow:var(--gY)}
+.toast.v{border-color:rgba(138,59,255,.5);color:var(--vt);box-shadow:var(--gV)}
+.toast.r{border-color:rgba(255,59,107,.5);color:var(--rd)}
+@keyframes tIn{from{opacity:0;transform:translateY(-12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tOut{to{opacity:0;transform:translateY(-8px) scale(.96)}}
+#story-d{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);width:min(680px,90%);background:linear-gradient(135deg,rgba(10,15,31,.95),rgba(17,24,53,.95));border:1px solid var(--cy);padding:16px 20px;z-index:8;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:var(--gC);display:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+#story-d.on{display:block;animation:dIn .4s ease}
+@keyframes dIn{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.sp{font-family:var(--fM);font-size:11px;color:var(--cy);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.st{color:var(--t0);font-size:14px;line-height:1.5}
+.sc{margin-top:12px;display:grid;gap:6px}
+.sch{background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.3);color:var(--t0);padding:9px 13px;font-family:var(--fM);font-size:12px;text-align:left;cursor:pointer;pointer-events:auto;transition:all .15s}
+.sch:hover{background:rgba(0,240,255,.15);border-color:var(--cy);transform:translateX(4px)}
+.ovl{position:absolute;inset:0;z-index:10;background:radial-gradient(ellipse at center,rgba(10,15,31,.85),rgba(5,7,15,.97));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+.ovl.on{display:flex}
+.ovl.on .pn{animation:pIn .5s cubic-bezier(.16,1,.3,1)}
+@keyframes pIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.pn{position:relative;max-width:820px;width:100%;max-height:90vh;overflow-y:auto;background:linear-gradient(135deg,rgba(17,24,53,.95),rgba(10,15,31,.95));border:1px solid rgba(0,240,255,.35);box-shadow:0 0 80px rgba(0,240,255,.15),inset 0 0 80px rgba(138,59,255,.06);padding:26px 32px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
+.pn::-webkit-scrollbar{width:6px}.pn::-webkit-scrollbar-track{background:rgba(0,0,0,.3)}.pn::-webkit-scrollbar-thumb{background:var(--cy)}
+.pn.m{border-color:rgba(255,43,214,.4);box-shadow:0 0 80px rgba(255,43,214,.18)}
+.pn.y{border-color:rgba(255,230,0,.4);box-shadow:0 0 80px rgba(255,230,0,.15)}
+.pn.v{border-color:rgba(138,59,255,.4);box-shadow:0 0 80px rgba(138,59,255,.18)}
+.pn h1,.pn h2,.pn h3{font-family:var(--fD);font-weight:900;letter-spacing:.04em;line-height:1.05}
+.pn h1{font-size:clamp(26px,5vw,46px);background:linear-gradient(90deg,var(--cy),var(--mg) 60%,var(--vt));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6px}
+.pn h2{font-size:18px;color:var(--cy);text-shadow:var(--gC);margin:16px 0 10px}
+.pn h3{font-size:13px;color:var(--t0);margin-bottom:8px}
+.pn .sb{font-family:var(--fM);font-size:10px;color:var(--t1);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.pn p{color:var(--t1);font-size:13px;line-height:1.6;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--cy),var(--vt));color:var(--bg-0);font-family:var(--fD);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:11px 18px;border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:transform .15s,filter .2s;pointer-events:auto}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.15)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn.gh{background:transparent;color:var(--cy);border:1px solid var(--cy);box-shadow:var(--gC)}
+.btn.mg{background:linear-gradient(135deg,var(--mg),var(--rd));color:var(--t0)}
+.btn.yl{background:linear-gradient(135deg,var(--yl),var(--or));color:var(--bg-0)}
+.tt{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid rgba(0,240,255,.15);flex-wrap:wrap}
+.tb{padding:7px 12px;font-family:var(--fM);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tb.on{color:var(--cy);border-bottom-color:var(--cy)}
+.tc{display:none}
+.tc.on{display:block}
+.tc.grid{display:none;grid-template-columns:1fr 1fr;gap:8px}
+.tc.grid.on{display:grid}
+.md{background:linear-gradient(135deg,rgba(0,240,255,.06),rgba(255,43,214,.06));border:1px solid rgba(0,240,255,.2);padding:10px 12px;cursor:pointer;transition:all .2s;position:relative}
+.md:hover:not(.lk):not(.ow){border-color:var(--cy);background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(255,43,214,.1))}
+.md.ow{border-color:var(--gn);background:linear-gradient(135deg,rgba(57,255,126,.1),rgba(57,255,126,.04));cursor:default}
+.md.lk{opacity:.35;cursor:not-allowed}
+.mdt{position:absolute;top:6px;right:10px;font-family:var(--fM);font-size:9px;color:var(--vt);letter-spacing:.15em}
+.mdn{font-family:var(--fD);font-weight:700;font-size:11px;color:var(--t0);letter-spacing:.06em;margin-bottom:3px}
+.mdd{font-size:10px;color:var(--t2);line-height:1.4}
+.mdc{font-family:var(--fM);font-size:10px;color:var(--yl);margin-top:5px}
+.md.ow .mdc{color:var(--gn)}.md.ow .mdc::before{content:'✓ '}
+.cb{background:var(--bg-0);border:1px solid var(--vt);padding:12px 14px;font-family:var(--fM);font-size:13px;color:var(--cy);margin:10px 0;line-height:1.6;box-shadow:inset 0 0 30px rgba(138,59,255,.15);white-space:pre-wrap;word-break:break-word}
+.cb .kw{color:var(--mg)}.cb .str{color:var(--yl)}.cb .com{color:var(--t2);font-style:italic}.cb .num{color:var(--gn)}
+.ca{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.ab{background:rgba(10,15,31,.7);border:1px solid rgba(0,240,255,.3);color:var(--t0);font-family:var(--fM);font-size:11px;padding:9px 11px;cursor:pointer;text-align:left;transition:all .15s;pointer-events:auto}
+.ab:hover{background:rgba(0,240,255,.1);border-color:var(--cy)}
+.ab.cr{background:rgba(57,255,126,.2);border-color:var(--gn);color:var(--gn)}
+.ab.wr{background:rgba(255,43,214,.2);border-color:var(--rd);color:var(--rd)}
+.ct{height:3px;background:rgba(255,255,255,.1);margin:12px 0 4px;overflow:hidden}
+.ctf{height:100%;background:linear-gradient(90deg,var(--gn),var(--yl),var(--rd));width:100%;transition:width .1s linear}
+.cc{display:inline-block;font-family:var(--fM);font-size:9px;padding:3px 7px;background:rgba(255,230,0,.1);border:1px solid rgba(255,230,0,.3);color:var(--yl);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}
+.s{background:rgba(0,240,255,.05);border:1px solid rgba(0,240,255,.2);padding:10px;text-align:center}
+.sl{font-family:var(--fM);font-size:9px;color:var(--t2);letter-spacing:.15em;text-transform:uppercase}
+.sv{font-family:var(--fD);font-weight:800;font-size:18px;color:var(--cy);text-shadow:var(--gC);margin-top:3px}
+.lb{margin:10px 0;border:1px solid rgba(0,240,255,.2)}
+.lbr{display:grid;grid-template-columns:28px 1fr 70px auto auto;gap:8px;padding:5px 10px;font-family:var(--fM);font-size:10px;border-bottom:1px solid rgba(0,240,255,.08);align-items:center}
+.lbr:last-child{border-bottom:none}.lbr.you{background:rgba(255,230,0,.06);color:var(--yl)}
+.lr{color:var(--t2)}.lr.g{color:var(--yl);font-weight:700}.lr.s2{color:#c0c8e0;font-weight:700}.lr.br{color:var(--or);font-weight:700}
+.ln{color:var(--t0)}.ls{color:var(--cy)}
+#tc{position:absolute;top:12px;right:14px;z-index:8;display:flex;gap:5px;pointer-events:auto}
+.ib{width:28px;height:28px;background:rgba(10,15,31,.7);border:1px solid rgba(0,240,255,.3);color:var(--cy);font-family:var(--fM);font-size:10px;font-weight:700;cursor:pointer;display:grid;place-items:center;transition:all .15s}
+.ib:hover{background:rgba(0,240,255,.15);border-color:var(--cy)}
+.db{background:linear-gradient(90deg,rgba(255,230,0,.1),rgba(255,43,214,.1));border:1px solid rgba(255,230,0,.3);padding:9px 12px;margin:10px 0;font-family:var(--fM);font-size:11px;color:var(--yl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.ac{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.kh{margin-top:10px;font-family:var(--fM);font-size:10px;color:var(--t2);letter-spacing:.1em;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap}
+.k{display:inline-block;padding:2px 7px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.2);color:var(--cy);margin-right:3px}
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;max-height:50vh;overflow-y:auto;padding-right:4px}
+.a{background:rgba(255,255,255,.03);border:1px solid rgba(0,240,255,.1);padding:9px;font-size:10px;font-family:var(--fM);color:var(--t2)}
+.a.u{border-color:var(--yl);background:rgba(255,230,0,.06);color:var(--yl)}
+.ai{font-size:17px;margin-bottom:4px}
+.fc{background:linear-gradient(135deg,rgba(10,15,31,.6),rgba(17,24,53,.6));border-left:3px solid;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fci h4{font-family:var(--fD);font-size:12px;margin-bottom:3px}
+.fci p{font-size:10px;margin:0;color:var(--t2)}
+.frn{font-family:var(--fM);font-size:15px;font-weight:700;min-width:50px;text-align:right}
+.cl{display:grid;gap:5px;max-height:50vh;overflow-y:auto}
+.ch{display:grid;grid-template-columns:30px 1fr auto;gap:10px;padding:8px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(0,240,255,.1);align-items:center;cursor:pointer;transition:all .15s}
+.ch:not(.lk):hover{border-color:var(--cy);background:rgba(0,240,255,.06)}
+.ch.lk{opacity:.4;cursor:not-allowed}
+.ch.cm{border-color:rgba(57,255,126,.3)}
+.chn{font-family:var(--fD);color:var(--cy);font-weight:700;font-size:13px}
+.chnm{font-family:var(--fU);font-size:13px}
+.chs{font-family:var(--fM);font-size:9px;color:var(--t2)}
+.ch.cm .chs{color:var(--gn)}
+.pt{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.pn-n{background:linear-gradient(135deg,rgba(138,59,255,.1),rgba(255,43,214,.05));border:1px solid rgba(138,59,255,.3);padding:10px;cursor:pointer;transition:all .15s}
+.pn-n:hover:not(.lk):not(.ow){border-color:var(--vt);transform:translateY(-2px)}
+.pn-n.ow{border-color:var(--gn);background:rgba(57,255,126,.06)}
+.pn-n.lk{opacity:.3;cursor:not-allowed}
+#obj{position:absolute;top:52px;right:14px;background:rgba(10,15,31,.75);border:1px solid rgba(255,230,0,.3);padding:8px 12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:var(--fM);font-size:11px;z-index:5;display:none;max-width:240px}
+#obj.on{display:block}
+.ot{color:var(--yl);font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
+.oi{color:var(--t1);padding:2px 0;font-size:11px}
+.oi.dn{color:var(--gn);text-decoration:line-through}
+#touch-ctrl{position:absolute;bottom:10px;left:0;right:0;z-index:6;display:none;justify-content:space-between;padding:0 20px;pointer-events:none}
+.tbtn{width:56px;height:56px;background:rgba(10,15,31,.6);border:2px solid rgba(0,240,255,.4);color:var(--cy);font-size:22px;border-radius:50%;display:grid;place-items:center;pointer-events:auto;backdrop-filter:blur(6px)}
+@media (hover:none) and (pointer:coarse){#touch-ctrl.show{display:flex}}
+@media (max-width:720px){#game-frame{width:100vw;height:100vh;aspect-ratio:unset;border:none}.pn{padding:18px}.tc.grid.on,.sg,.ca{grid-template-columns:1fr}.hv{font-size:13px}#combo{font-size:32px;right:10px}.pn h1{font-size:24px}}
+.vi{display:grid;gap:8px;margin:12px 0}
+</style>
+</head>
+<body>
+<div id="game-frame">
+<canvas id="game"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+<div id="hud-tl">
+<div class="hc"><div class="hl" data-i18n="dist">DIST</div><div class="hv" id="h-d">0M</div></div>
+<div class="hc"><div class="hl" data-i18n="speed">SPEED</div><div class="hv" id="h-s">0</div></div>
+<div class="hc"><div class="hl" data-i18n="heat">HEAT</div><div class="hv o" id="h-h">0</div><div class="pb"><div class="pbf h" id="h-hf" style="width:0%"></div></div></div>
+</div>
+<div id="hud-tc"><div class="hc"><div class="hl" data-i18n="score">SCORE</div><div class="hv y" id="h-sc">0</div></div></div>
+<div id="hud-tr">
+<div class="hc r"><div class="hl" data-i18n="leads">LEADS</div><div class="hv m" id="h-l">0</div><div class="pb"><div class="pbf" id="h-lf" style="width:0%"></div></div></div>
+<div class="hc r"><div class="hl" data-i18n="credits">CR</div><div class="hv g" id="h-c">0</div></div>
+<div class="hc r"><div class="hl" data-i18n="data">DATA</div><div class="hv v" id="h-da">0</div></div>
+</div>
+</div>
+
+<div id="faction-bar"><div class="fr-t">REP · 6 FACTIONS</div><div id="fr-rows"></div></div>
+<div id="obj"><div class="ot" data-i18n="obj-title">MISSION</div><div id="obj-list"></div></div>
+<div id="combo"><span>×</span><span id="combo-n">2</span></div>
+<div id="toasts"></div>
+
+<div id="story-d"><div class="sp" id="sd-sp">— NEXUS</div><div class="st" id="sd-tx"></div><div class="sc" id="sd-ch"></div></div>
+
+<div id="tc">
+<button class="ib" id="b-lang" title="Language">RO</button>
+<button class="ib" id="b-sound" title="Sound">♪</button>
+<button class="ib" id="b-fac" title="Factions">⚔</button>
+<button class="ib" id="b-pause" title="Pause">⏸</button>
+</div>
+
+<div id="touch-ctrl"><div class="tbtn" id="t-l">◀</div><div class="tbtn" id="t-r">▶</div></div>
+
+<!-- START -->
+<div class="ovl on scanlines" id="ov-start">
+<div class="pn">
+<div class="sb" data-i18n="boot">// NEXUS OS v2.0 · OPERATIVE NETWORK · LAURANDREEA10</div>
+<h1>NEXUS PROTOCOL</h1>
+<p style="color:var(--cy);font-family:var(--fM);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px">// OPERATIVE NETWORK · v2.0</p>
+<p data-i18n="tagline">Cyberpunk endless runner. CRM tycoon meta-layer. Code breaker challenges. Narrative branching cu 6 facțiuni. 12 capitole story mode. AI Director adaptiv.</p>
+<div class="tt">
+<div class="tb on" data-tab="brief" data-i18n="tab-brief">BRIEF</div>
+<div class="tb" data-tab="lore" data-i18n="tab-lore">LORE</div>
+<div class="tb" data-tab="sys" data-i18n="tab-systems">SYSTEMS</div>
+<div class="tb" data-tab="ctrl" data-i18n="tab-controls">CTRL</div>
+<div class="tb" data-tab="agent" data-i18n="tab-agent">AGENT</div>
+</div>
+<div class="tc on" id="t-brief">
+<p data-i18n="brief-1"><b style="color:var(--cy)">🛣 DRIVE:</b> Conduci pe coridorul magnetic. Eviți obstacolele, prinzi lead-uri, energy, data shards și boost.</p>
+<p data-i18n="brief-2"><b style="color:var(--mg)">💼 CRM:</b> 16 module în 4 trees. Lead-urile cresc tree-urile.</p>
+<p data-i18n="brief-3"><b style="color:var(--yl)">🧠 CODE:</b> 24 challenges în 4 categorii. 8s/răspuns. ×2 multiplier la corect.</p>
+<p data-i18n="brief-4"><b style="color:var(--vt)">📡 NARRATIVE:</b> 6 facțiuni cu reputație. Alegerile schimbă rep, rep deblochează module exclusive.</p>
+<p data-i18n="brief-5"><b style="color:var(--gn)">⚡ PRESTIGE:</b> La rang 10 resetezi pentru Quantum Cores.</p>
+<div class="db" id="db"><span><span data-i18n="daily">SEED ZILNIC</span>: <span id="db-t">—</span></span><span id="db-r">+800 CR</span></div>
+</div>
+<div class="tc" id="t-lore">
+<h3 style="color:var(--mg);margin-top:0" data-i18n="lh1">Sectorul Nexus · 2087</h3>
+<p data-i18n="l1"><i>Orașul-rețea funcționează ca un singur organism. Sectorul comercial — un coridor magnetic suspendat între cele șase turnuri corporative — e singurul loc unde tranzacțiile fizice mai au sens.</i></p>
+<p data-i18n="l2"><i>Tu ești <b style="color:var(--cy)">Agent Nexus</b> — operator hibrid licențiat să transporte <b style="color:var(--mg)">lead-uri</b> prin coridor. Ești singurul care decide cui aparțin.</i></p>
+<h3 style="color:var(--yl);margin-top:12px" data-i18n="lh2">Cele 6 facțiuni</h3>
+<ul style="font-family:var(--fM);font-size:11px;color:var(--t1);line-height:1.7;list-style:none">
+<li style="color:var(--cy)">◆ <b>HELIX·CORP</b> — <span data-i18n="hx">Logistică, bani, viteză.</span></li>
+<li style="color:var(--mg)">◆ <b>VYRA·NET</b> — <span data-i18n="vy">Date, profilare predictivă.</span></li>
+<li style="color:var(--yl)">◆ <b>AURUM·SYNDICATE</b> — <span data-i18n="au">Brokeri, billing layer.</span></li>
+<li style="color:var(--gn)">◆ <b>OMNICELL</b> — <span data-i18n="om">Biotech, repair.</span></li>
+<li style="color:var(--vt)">◆ <b>SIGIL·TRUST</b> — <span data-i18n="sg">Identitate, RBAC.</span></li>
+<li style="color:var(--or)">◆ <b>NULL·COLLECTIVE</b> — <span data-i18n="nu">Hackeri, anti-corp.</span></li>
+</ul>
+</div>
+<div class="tc" id="t-sys">
+<p data-i18n="s1"><b>Heat System</b> — fără coliziune crește Heat. La 100 → Hot Zone cu valori ×2 dar obstacole agresive.</p>
+<p data-i18n="s2"><b>AI Director</b> — ajustează dificultatea real-time. Prea ușor → mai multe spike-uri.</p>
+<p data-i18n="s3"><b>Weather</b> — 5 tipuri: clear, neon rain (data ×3), solar flare (boost +50%), night fog (score ×1.5), quantum storm.</p>
+<p data-i18n="s4"><b>Data Shards</b> — pickup violet rar. 50 → Story Beat. 500 → Prestige unlock.</p>
+<p data-i18n="s5"><b>Vendors</b> — la 1500m apare vendor random. Plătești cu rep, iei buff temporar.</p>
+</div>
+<div class="tc" id="t-ctrl">
+<div class="kh">
+<span><span class="k">A</span><span class="k">←</span> <span data-i18n="left">stânga</span></span>
+<span><span class="k">D</span><span class="k">→</span> <span data-i18n="right">dreapta</span></span>
+<span><span class="k">SPACE</span> <span data-i18n="boost">boost (-100 CR)</span></span>
+<span><span class="k">P</span><span class="k">ESC</span> <span data-i18n="pause">pauză</span></span>
+<span><span class="k">F</span> <span data-i18n="factions">facțiuni</span></span>
+</div>
+</div>
+<div class="tc" id="t-agent">
+<div class="sg">
+<div class="s"><div class="sl" data-i18n="rank">RANG</div><div class="sv" id="ag-r">1</div></div>
+<div class="s"><div class="sl" data-i18n="xp">XP</div><div class="sv" id="ag-x">0</div></div>
+<div class="s"><div class="sl" data-i18n="prestige">PRESTIGE</div><div class="sv" id="ag-p">0</div></div>
+<div class="s"><div class="sl" data-i18n="qc">QUANTUM</div><div class="sv" id="ag-q">0</div></div>
+<div class="s"><div class="sl" data-i18n="runs">RUN-URI</div><div class="sv" id="ag-rn">0</div></div>
+<div class="s"><div class="sl" data-i18n="chapters">STORY</div><div class="sv" id="ag-c">0/12</div></div>
+</div>
+</div>
+<div class="ac">
+<button class="btn" id="b-start" data-i18n="start">▶ FREE RUN</button>
+<button class="btn mg" id="b-story" data-i18n="story-mode">📖 STORY</button>
+<button class="btn yl" id="b-daily" data-i18n="daily-seed">🎲 DAILY</button>
+<button class="btn gh" id="b-lb" data-i18n="lb">LEADERBOARD</button>
+<button class="btn gh" id="b-ach" data-i18n="ach">ACHIEVEMENTS</button>
+<button class="btn gh" id="b-prest" data-i18n="prest-tree">PRESTIGE</button>
+<button class="btn gh" id="b-factmod" data-i18n="factions">FACTIONS</button>
+</div>
+</div>
+</div>
+
+<!-- PAUSE -->
+<div class="ovl scanlines" id="ov-pause">
+<div class="pn">
+<div class="sb">// SYSTEM HALTED</div>
+<h1 data-i18n="paused">PAUZĂ</h1>
+<div class="sg">
+<div class="s"><div class="sl" data-i18n="dist">DIST</div><div class="sv" id="p-d">0M</div></div>
+<div class="s"><div class="sl" data-i18n="score">SCORE</div><div class="sv" id="p-s">0</div></div>
+<div class="s"><div class="sl" data-i18n="combo">COMBO</div><div class="sv" id="p-c">×1</div></div>
+</div>
+<div class="ac"><button class="btn" id="b-resume" data-i18n="resume">▶ RESUME</button><button class="btn gh" id="b-quit" data-i18n="quit">END</button></div>
+</div>
+</div>
+
+<!-- CRM -->
+<div class="ovl scanlines" id="ov-crm">
+<div class="pn m">
+<div class="sb">// NEXUS CRM v2 · 4 SKILL TREES</div>
+<h1 data-i18n="crm-title">CRM UPGRADE</h1>
+<div class="sg">
+<div class="s"><div class="sl" data-i18n="credits">CREDITS</div><div class="sv" id="cr-c">0</div></div>
+<div class="s"><div class="sl" data-i18n="leads-closed">LEADS</div><div class="sv" id="cr-l">0</div></div>
+<div class="s"><div class="sl" data-i18n="modules">MODULES</div><div class="sv" id="cr-m">0/16</div></div>
+</div>
+<div class="tt">
+<div class="tb on" data-tree="acq" data-i18n="acq">ACQUISITION</div>
+<div class="tb" data-tree="ret" data-i18n="ret">RETENTION</div>
+<div class="tb" data-tree="ops" data-i18n="ops">OPERATIONS</div>
+<div class="tb" data-tree="intel" data-i18n="intel">INTELLIGENCE</div>
+</div>
+<div class="tc grid on" id="tr-acq"></div>
+<div class="tc grid" id="tr-ret"></div>
+<div class="tc grid" id="tr-ops"></div>
+<div class="tc grid" id="tr-intel"></div>
+<div class="ac"><button class="btn" id="b-crm" data-i18n="continue">▶ CONTINUE</button></div>
+</div>
+</div>
+
+<!-- CODE BREAKER -->
+<div class="ovl scanlines" id="ov-code">
+<div class="pn y">
+<div class="sb">// CHECKPOINT · CODE BREAKER</div>
+<span class="cc" id="c-cat">JAVASCRIPT</span>
+<h1 style="color:var(--yl);-webkit-text-fill-color:var(--yl);background:none;text-shadow:var(--gY)" data-i18n="checkpoint">CHECKPOINT</h1>
+<p id="c-q" data-i18n="code-q">Ce returnează?</p>
+<div class="cb" id="c-b"></div>
+<div class="ct"><div class="ctf" id="c-t"></div></div>
+<div class="ca" id="c-a"></div>
+<p style="margin-top:12px;font-size:11px" data-i18n="code-reward"><b style="color:var(--yl)">Reward:</b> Corect → ×2 combo 15s + 300 CR + 50 data + Null rep. Greșit → slowdown 3s + Heat +20.</p>
+</div>
+</div>
+
+<!-- GAME OVER -->
+<div class="ovl scanlines" id="ov-end">
+<div class="pn">
+<div class="sb" data-i18n="run-complete">// RUN TERMINATED · LOG ARCHIVED</div>
+<h1 data-i18n="game-over">GAME OVER</h1>
+<div class="sg" style="grid-template-columns:repeat(4,1fr)">
+<div class="s"><div class="sl" data-i18n="dist">DIST</div><div class="sv" id="e-d">0M</div></div>
+<div class="s"><div class="sl" data-i18n="score">SCORE</div><div class="sv" id="e-s">0</div></div>
+<div class="s"><div class="sl" data-i18n="leads">LEADS</div><div class="sv" id="e-l">0</div></div>
+<div class="s"><div class="sl" data-i18n="credits">CR</div><div class="sv" id="e-c">0</div></div>
+<div class="s"><div class="sl" data-i18n="checkpoints">CHK</div><div class="sv" id="e-ch">0</div></div>
+<div class="s"><div class="sl" data-i18n="modules">MOD</div><div class="sv" id="e-m">0</div></div>
+<div class="s"><div class="sl" data-i18n="data">DATA</div><div class="sv" id="e-da">0</div></div>
+<div class="s"><div class="sl" data-i18n="xp">XP</div><div class="sv" id="e-x">0</div></div>
+</div>
+<h2 data-i18n="top-runs">TOP RUNS</h2>
+<div class="lb" id="e-lb"></div>
+<div class="ac"><button class="btn" id="b-retry" data-i18n="retry">▶ NEW RUN</button><button class="btn gh" id="b-home" data-i18n="home">HOME</button><button class="btn gh" id="b-share" data-i18n="share">SHARE</button></div>
+</div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="ovl scanlines" id="ov-lb">
+<div class="pn">
+<div class="sb">// TOP OPERATORS</div>
+<h1 data-i18n="lb">LEADERBOARD</h1>
+<div class="lb" id="m-lb"></div>
+<div class="ac"><button class="btn" id="b-lbc" data-i18n="back">◀ BACK</button><button class="btn gh" id="b-lbr" data-i18n="reset">RESET</button></div>
+</div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="ovl scanlines" id="ov-ach">
+<div class="pn">
+<div class="sb">// 30 ACHIEVEMENTS</div>
+<h1 data-i18n="ach">ACHIEVEMENTS</h1>
+<p id="a-prog" style="text-align:center;color:var(--cy);font-family:var(--fM)">0 / 30</p>
+<div class="ag" id="a-grid"></div>
+<div class="ac"><button class="btn" id="b-achc" data-i18n="back">◀ BACK</button></div>
+</div>
+</div>
+
+<!-- STORY -->
+<div class="ovl scanlines" id="ov-story">
+<div class="pn m">
+<div class="sb">// 12 CHAPTERS · BRANCHING</div>
+<h1 data-i18n="story-mode">STORY MODE</h1>
+<p data-i18n="story-desc">Fiecare capitol are obiectiv + dialog cu facțiune. Alegerile schimbă rep. 3 finaluri posibile.</p>
+<div class="cl" id="ch-list"></div>
+<div class="ac"><button class="btn" id="b-storyc" data-i18n="back">◀ BACK</button></div>
+</div>
+</div>
+
+<!-- PRESTIGE -->
+<div class="ovl scanlines" id="ov-prest">
+<div class="pn v">
+<div class="sb">// META-PROGRESSION</div>
+<h1 data-i18n="prest-tree">PRESTIGE TREE</h1>
+<div class="sg">
+<div class="s"><div class="sl" data-i18n="qc">QUANTUM</div><div class="sv" id="pr-q">0</div></div>
+<div class="s"><div class="sl" data-i18n="prestige">PRESTIGE</div><div class="sv" id="pr-l">0</div></div>
+<div class="s"><div class="sl" data-i18n="rank">RANK</div><div class="sv" id="pr-r">1</div></div>
+</div>
+<p data-i18n="prest-desc">La rang 10 poți activa Prestige — resetezi dar primești 1 Quantum Core și un bonus permanent.</p>
+<button class="btn mg" id="b-doprest" disabled style="margin:12px 0" data-i18n="do-prestige">⚡ ACTIVATE PRESTIGE</button>
+<h2 data-i18n="prest-nodes-h">PRESTIGE NODES</h2>
+<div class="pt" id="pr-nodes"></div>
+<div class="ac"><button class="btn" id="b-prestc" data-i18n="back">◀ BACK</button></div>
+</div>
+</div>
+
+<!-- FACTIONS -->
+<div class="ovl scanlines" id="ov-fact">
+<div class="pn">
+<div class="sb">// 6 FACTIONS · REPUTATION</div>
+<h1 data-i18n="factions-h">FACTIONS</h1>
+<p data-i18n="factions-desc">Rep -100 (ostil) → +100 (aliat). La +50 vendor discount. La +100 modul faction unlock.</p>
+<div id="f-cards"></div>
+<div class="ac"><button class="btn" id="b-factc" data-i18n="back">◀ BACK</button></div>
+</div>
+</div>
+
+<!-- VENDOR -->
+<div class="ovl scanlines" id="ov-vend">
+<div class="pn">
+<div class="sb" id="v-lbl">// VENDOR</div>
+<h1 id="v-t" style="-webkit-text-fill-color:initial;background:none">VENDOR</h1>
+<p id="v-g"></p>
+<div class="vi" id="v-it"></div>
+<div class="ac"><button class="btn gh" id="b-vendl" data-i18n="leave">LEAVE</button></div>
+</div>
+</div>
+
+</div>
+<script>
+'use strict';
+// ============================================================
+// NEXUS PROTOCOL v2 — Operative Network
+// Single-file game by Laura Andreea · 2026
+// ============================================================
+
+/* ---- i18n ---- */
+const I18N={
+  ro:{dist:'DIST',speed:'VITEZĂ',heat:'HEAT',score:'SCOR',leads:'LEAD',credits:'CR',data:'DATA',
+    boot:'// NEXUS OS v2.0 · REȚEA OPERATIVĂ · LAURANDREEA10',
+    tagline:'Cyberpunk endless runner. CRM tycoon. Code breaker. 6 facțiuni. 12 capitole. AI Director.',
+    'tab-brief':'BRIEF','tab-lore':'LORE','tab-systems':'SISTEME','tab-controls':'CTRL','tab-agent':'AGENT',
+    'brief-1':'<b style="color:var(--cy)">🛣 DRIVE:</b> Conduci pe coridorul magnetic. Eviți obstacole, prinzi lead-uri.',
+    'brief-2':'<b style="color:var(--mg)">💼 CRM:</b> 16 module în 4 trees. Lead-urile cresc tree-urile.',
+    'brief-3':'<b style="color:var(--yl)">🧠 CODE:</b> 24 challenges în 4 categorii. 8s/răspuns.',
+    'brief-4':'<b style="color:var(--vt)">📡 NARRATIVE:</b> 6 facțiuni cu reputație separată.',
+    'brief-5':'<b style="color:var(--gn)">⚡ PRESTIGE:</b> La rang 10 resetezi pentru Quantum Cores.',
+    daily:'SEED ZILNIC',
+    lh1:'Sectorul Nexus · 2087',
+    l1:'<i>Orașul-rețea funcționează ca un singur organism. Coridorul magnetic suspendat între cele șase turnuri corporative e singurul loc unde tranzacțiile fizice mai au sens.</i>',
+    l2:'<i>Tu ești <b style="color:var(--cy)">Agent Nexus</b> — operator hibrid care transportă <b style="color:var(--mg)">lead-uri</b> prin coridor. Tu decizi cui aparțin.</i>',
+    lh2:'Cele 6 facțiuni',
+    hx:'Logistică verticală, bani, viteză.',vy:'Date personale, profilare predictivă.',
+    au:'Brokeri financiari, billing.',om:'Biotech, repair.',sg:'Identitate, RBAC.',nu:'Hackeri, anti-corp.',
+    s1:'<b>Heat</b> — fără coliziune crește Heat. La 100 → Hot Zone cu valori ×2.',
+    s2:'<b>AI Director</b> — ajustează dificultatea real-time în funcție de cum joci.',
+    s3:'<b>Weather</b> — 5 tipuri de vreme cu efecte diferite per run.',
+    s4:'<b>Data Shards</b> — pickup violet. 50 → Story Beat. 500 → Prestige.',
+    s5:'<b>Vendors</b> — la 1500m apare vendor cu buff-uri temporare.',
+    left:'stânga',right:'dreapta',boost:'boost',pause:'pauză',factions:'facțiuni',
+    rank:'RANG',xp:'XP',prestige:'PRESTIGE',qc:'QUANTUM',runs:'RUN',chapters:'STORY',
+    start:'▶ FREE RUN','story-mode':'📖 STORY','daily-seed':'🎲 DAILY',
+    lb:'LEADERBOARD',ach:'ACHIEVEMENTS','prest-tree':'PRESTIGE',
+    paused:'PAUZĂ',combo:'COMBO',resume:'▶ CONTINUĂ',quit:'ÎNCHEIE',
+    'crm-title':'UPGRADE CRM',acq:'ACHIZIȚIE',ret:'RETENȚIE',ops:'OPERAȚIUNI',intel:'INTELIGENȚĂ',
+    'leads-closed':'LEAD-URI',modules:'MODULE',continue:'▶ CONTINUĂ',
+    checkpoint:'CHECKPOINT','code-q':'Ce returnează?',
+    'code-reward':'<b style="color:var(--yl)">Reward:</b> Corect → ×2 combo 15s + 300 CR + 50 data + Null rep.',
+    'run-complete':'// RUN ÎNCHEIAT','game-over':'GAME OVER',
+    checkpoints:'CHK','top-runs':'TOP RUN-URI',retry:'▶ RUN NOU',home:'ACASĂ',share:'SHARE',
+    back:'◀ ÎNAPOI',reset:'RESET',
+    'story-desc':'Capitole cu dialog + alegeri care schimbă rep. 3 finaluri posibile.',
+    'prest-desc':'La rang 10 activezi Prestige — resetezi dar primești 1 Quantum Core.',
+    'do-prestige':'⚡ ACTIVATE PRESTIGE','prest-nodes-h':'NODES',
+    'factions-h':'FACȚIUNI','factions-desc':'Rep -100 → +100. Vendor discount la +50. Faction module la +100.',
+    leave:'PLEACĂ','obj-title':'MISIUNE',
+    t_lead:'LEAD ÎNCHIS',t_mod:'MODUL',t_combo:'COMBO',t_correct:'COD VALID ×2',t_wrong:'EȘUAT',
+    t_crash:'COLIZIUNE',t_boost:'BOOST',t_rank:'RANG NOU',t_data:'DATA',t_ch:'CAPITOL',
+    t_hot:'HOT ZONE',t_vendor:'VENDOR',t_skip:'SKIP'},
+  en:{dist:'DIST',speed:'SPEED',heat:'HEAT',score:'SCORE',leads:'LEADS',credits:'CR',data:'DATA',
+    boot:'// NEXUS OS v2.0 · OPERATIVE NETWORK · LAURANDREEA10',
+    tagline:'Cyberpunk endless runner. CRM tycoon. Code breaker. 6 factions. 12 chapters. AI Director.',
+    'tab-brief':'BRIEF','tab-lore':'LORE','tab-systems':'SYSTEMS','tab-controls':'CTRL','tab-agent':'AGENT',
+    'brief-1':'<b style="color:var(--cy)">🛣 DRIVE:</b> Drive the magnetic corridor. Dodge obstacles, grab leads.',
+    'brief-2':'<b style="color:var(--mg)">💼 CRM:</b> 16 modules in 4 trees. Leads grow the trees.',
+    'brief-3':'<b style="color:var(--yl)">🧠 CODE:</b> 24 challenges in 4 categories. 8s/answer.',
+    'brief-4':'<b style="color:var(--vt)">📡 NARRATIVE:</b> 6 factions with separate reputation.',
+    'brief-5':'<b style="color:var(--gn)">⚡ PRESTIGE:</b> At rank 10 reset for Quantum Cores.',
+    daily:'DAILY SEED',
+    lh1:'Nexus Sector · 2087',
+    l1:'<i>The network-city runs as a single organism. The magnetic corridor between the six corporate towers is the only place where physical transactions still make sense.</i>',
+    l2:'<i>You are <b style="color:var(--cy)">Agent Nexus</b> — a hybrid operator transporting <b style="color:var(--mg)">leads</b> through the corridor. You decide whose they are.</i>',
+    lh2:'The 6 factions',
+    hx:'Vertical logistics, money, speed.',vy:'Personal data, predictive profiling.',
+    au:'Financial brokers, billing.',om:'Biotech, repair.',sg:'Identity, RBAC.',nu:'Hackers, anti-corp.',
+    s1:'<b>Heat</b> — no crash raises Heat. At 100 → Hot Zone with ×2 values.',
+    s2:'<b>AI Director</b> — adjusts difficulty in real time based on your play.',
+    s3:'<b>Weather</b> — 5 types of weather with different per-run effects.',
+    s4:'<b>Data Shards</b> — violet pickup. 50 → Story Beat. 500 → Prestige.',
+    s5:'<b>Vendors</b> — at 1500m a vendor appears with temporary buffs.',
+    left:'left',right:'right',boost:'boost',pause:'pause',factions:'factions',
+    rank:'RANK',xp:'XP',prestige:'PRESTIGE',qc:'QUANTUM',runs:'RUNS',chapters:'STORY',
+    start:'▶ FREE RUN','story-mode':'📖 STORY','daily-seed':'🎲 DAILY',
+    lb:'LEADERBOARD',ach:'ACHIEVEMENTS','prest-tree':'PRESTIGE',
+    paused:'PAUSED',combo:'COMBO',resume:'▶ RESUME',quit:'END',
+    'crm-title':'CRM UPGRADE',acq:'ACQUISITION',ret:'RETENTION',ops:'OPERATIONS',intel:'INTELLIGENCE',
+    'leads-closed':'LEADS',modules:'MODULES',continue:'▶ CONTINUE',
+    checkpoint:'CHECKPOINT','code-q':'What does it return?',
+    'code-reward':'<b style="color:var(--yl)">Reward:</b> Right → ×2 combo 15s + 300 CR + 50 data + Null rep.',
+    'run-complete':'// RUN TERMINATED','game-over':'GAME OVER',
+    checkpoints:'CHK','top-runs':'TOP RUNS',retry:'▶ NEW RUN',home:'HOME',share:'SHARE',
+    back:'◀ BACK',reset:'RESET',
+    'story-desc':'Chapters with dialogue + choices that change rep. 3 possible endings.',
+    'prest-desc':'At rank 10 activate Prestige — reset but receive 1 Quantum Core.',
+    'do-prestige':'⚡ ACTIVATE PRESTIGE','prest-nodes-h':'NODES',
+    'factions-h':'FACTIONS','factions-desc':'Rep -100 → +100. Vendor discount at +50. Faction module at +100.',
+    leave:'LEAVE','obj-title':'MISSION',
+    t_lead:'LEAD CLOSED',t_mod:'MODULE',t_combo:'COMBO',t_correct:'CODE VALID ×2',t_wrong:'FAILED',
+    t_crash:'COLLISION',t_boost:'BOOST',t_rank:'NEW RANK',t_data:'DATA',t_ch:'CHAPTER',
+    t_hot:'HOT ZONE',t_vendor:'VENDOR',t_skip:'SKIP'}
+};
+let LANG=localStorage.getItem('nx2.lang')||'ro';
+function t(k){return (I18N[LANG]&&I18N[LANG][k])||I18N.ro[k]||k}
+function applyI18n(){document.documentElement.lang=LANG;document.querySelectorAll('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n);if(v.includes('<'))el.innerHTML=v;else el.textContent=v});document.getElementById('b-lang').textContent=LANG.toUpperCase()}
+
+/* ---- Store ---- */
+const S={
+  g(k,d){try{const v=localStorage.getItem('nx2.'+k);return v?JSON.parse(v):d}catch{return d}},
+  s(k,v){try{localStorage.setItem('nx2.'+k,JSON.stringify(v))}catch{}}
+};
+
+/* ---- Seeded RNG ---- */
+let _seed=1;
+function setSeed(s){_seed=s||1}
+function rng(){_seed=(_seed*9301+49297)%233280;return _seed/233280}
+function rngI(min,max){return Math.floor(rng()*(max-min+1))+min}
+
+/* ---- Audio ---- */
+const A={ctx:null,en:S.g('sound',true),m:null,
+  init(){if(this.ctx)return;try{this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.m=this.ctx.createGain();this.m.gain.value=this.en?0.16:0;this.m.connect(this.ctx.destination)}catch{}},
+  tog(){this.en=!this.en;S.s('sound',this.en);if(this.m)this.m.gain.value=this.en?0.16:0;document.getElementById('b-sound').textContent=this.en?'♪':'♪̸'},
+  b(f=440,d=.08,t='square',v=1){if(!this.ctx||!this.en)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(0,this.ctx.currentTime);g.gain.linearRampToValueAtTime(v,this.ctx.currentTime+.005);g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);o.connect(g);g.connect(this.m);o.start();o.stop(this.ctx.currentTime+d)},
+  lead(){this.b(880,.08,'sine',.8);setTimeout(()=>this.b(1320,.12,'sine',.6),50)},
+  en2(){this.b(660,.06,'triangle',.6)},
+  dat(){this.b(1100,.04,'sine',.5);setTimeout(()=>this.b(1500,.06,'sine',.5),30);setTimeout(()=>this.b(2000,.08,'sine',.4),70)},
+  crash(){this.b(80,.35,'sawtooth',1);setTimeout(()=>this.b(50,.35,'sawtooth',.8),100)},
+  ok(){this.b(523,.08,'sine',.8);setTimeout(()=>this.b(659,.08,'sine',.8),80);setTimeout(()=>this.b(784,.14,'sine',.8),160)},
+  no(){this.b(200,.15,'sawtooth',.8);setTimeout(()=>this.b(150,.2,'sawtooth',.8),120)},
+  mod(){this.b(440,.08,'square',.6);setTimeout(()=>this.b(660,.08,'square',.6),60);setTimeout(()=>this.b(880,.14,'square',.6),120)},
+  rk(){this.b(523,.1,'square',.7);setTimeout(()=>this.b(659,.1,'square',.7),80);setTimeout(()=>this.b(784,.1,'square',.7),160);setTimeout(()=>this.b(1047,.2,'square',.7),240)},
+  c(){this.b(1200,.03,'square',.4)},dlg(){this.b(500,.04,'sine',.3)}
+};
+
+/* ---- 6 Factions ---- */
+const FACS=[
+  {id:'helix',n:'HELIX·CORP',hex:'#00f0ff',d_ro:'Logistică, bani, viteză.',d_en:'Logistics, money, speed.'},
+  {id:'vyra',n:'VYRA·NET',hex:'#ff2bd6',d_ro:'Date, profilare predictivă.',d_en:'Data, predictive profiling.'},
+  {id:'aurum',n:'AURUM·SYNDICATE',hex:'#ffe600',d_ro:'Brokeri, billing.',d_en:'Brokers, billing.'},
+  {id:'omni',n:'OMNICELL',hex:'#39ff7e',d_ro:'Biotech, repair.',d_en:'Biotech, repair.'},
+  {id:'sigil',n:'SIGIL·TRUST',hex:'#8a3bff',d_ro:'Identitate, RBAC.',d_en:'Identity, RBAC.'},
+  {id:'null',n:'NULL·COLLECTIVE',hex:'#ff8c1a',d_ro:'Hackeri, anti-corp.',d_en:'Hackers, anti-corp.'}
+];
+
+/* ---- 16 Modules (4 trees × 4 tiers) ---- */
+const MODS=[
+  {id:'kanban',tr:'acq',t:1,c:300,n:'KANBAN',d_ro:'+10% credite din lead-uri',d_en:'+10% credits from leads'},
+  {id:'pipeline',tr:'acq',t:2,c:700,n:'PIPELINE',d_ro:'Lead-uri = +1 combo extra',d_en:'Leads grant +1 extra combo'},
+  {id:'inbound',tr:'acq',t:3,c:1400,n:'INBOUND·ENGINE',d_ro:'Magnet pentru toate pickup-urile',d_en:'Magnet for all pickups'},
+  {id:'lead_ai',tr:'acq',t:4,c:2800,n:'LEAD·AI',d_ro:'+50% credite din lead-uri',d_en:'+50% credits from leads'},
+  {id:'autosave',tr:'ret',t:1,c:300,n:'AUTOSAVE',d_ro:'50% șansă să nu pierzi viață',d_en:'50% to keep life'},
+  {id:'churn',tr:'ret',t:2,c:700,n:'CHURN·LOCK',d_ro:'Combo nu se pierde la crash',d_en:'Combo survives crash'},
+  {id:'health',tr:'ret',t:3,c:1400,n:'HEALTH·SCORE',d_ro:'+1 viață la 2000m',d_en:'+1 life at 2000m'},
+  {id:'success',tr:'ret',t:4,c:2800,n:'SUCCESS·LOOP',d_ro:'La 3000m → +1 viață',d_en:'At 3000m → +1 life'},
+  {id:'flow',tr:'ops',t:1,c:300,n:'FLOW·BUILDER',d_ro:'Energy = +1 lead',d_en:'Energy = +1 lead'},
+  {id:'billing',tr:'ops',t:2,c:700,n:'BILLING',d_ro:'+25% credite',d_en:'+25% credits'},
+  {id:'booking',tr:'ops',t:3,c:1400,n:'BOOKING',d_ro:'Magnet lead-uri',d_en:'Lead magnet'},
+  {id:'quantum',tr:'ops',t:4,c:2800,n:'QUANTUM·CORE',d_ro:'Boost durează ×2',d_en:'Boost lasts ×2'},
+  {id:'rbac',tr:'intel',t:1,c:300,n:'RBAC',d_ro:'+0.5s invincibility la lead',d_en:'+0.5s invinc on lead'},
+  {id:'analytics',tr:'intel',t:2,c:700,n:'ANALYTICS',d_ro:'Data shards ×2',d_en:'Data shards ×2'},
+  {id:'ai_co',tr:'intel',t:3,c:1400,n:'AI·COPILOT',d_ro:'Auto-solve 1 challenge/run',d_en:'Auto-solve 1/run'},
+  {id:'nexus',tr:'intel',t:4,c:2800,n:'NEXUS·CORE',d_ro:'Toate efectele ×1.25',d_en:'All effects ×1.25'}
+];
+
+/* ---- 24 Challenges ---- */
+const CH=[
+  {cat:'JS',code:'<span class="kw">typeof</span> <span class="kw">null</span>',q:'?',a:['"object"','"null"','"undefined"','null'],c:0},
+  {cat:'JS',code:'[<span class="num">10</span>,<span class="num">1</span>,<span class="num">2</span>].<span class="kw">sort</span>()',q:'?',a:['[1,10,2]','[1,2,10]','[10,2,1]','Error'],c:0},
+  {cat:'JS',code:'<span class="num">0.1</span>+<span class="num">0.2</span>===<span class="num">0.3</span>',q:'?',a:['false','true','NaN','undefined'],c:0},
+  {cat:'JS',code:'<span class="kw">const</span> a=[<span class="num">1</span>];\n<span class="kw">const</span> b=a;\nb.push(<span class="num">2</span>);\na.length',q:'?',a:['2','1','undefined','3'],c:0},
+  {cat:'JS',code:'<span class="kw">typeof</span> []',q:'?',a:['"object"','"array"','"list"','Array'],c:0},
+  {cat:'JS',code:'<span class="str">"5"</span>-<span class="num">2</span>',q:'?',a:['3','"3"','"52"','NaN'],c:0},
+  {cat:'JS',code:'<span class="kw">Boolean</span>(<span class="str">"0"</span>)',q:'?',a:['true','false','"0"','NaN'],c:0},
+  {cat:'JS',code:'[<span class="num">1</span>,<span class="num">2</span>].<span class="kw">map</span>(<span class="kw">String</span>)',q:'?',a:["['1','2']","[1,2]","'1,2'",'Error'],c:0},
+  {cat:'REGEX',code:'/^\\d{3}$/.<span class="kw">test</span>(<span class="str">"4321"</span>)',q:'?',a:['false','true','null','"4321"'],c:0},
+  {cat:'REGEX',code:'<span class="str">"hello"</span>.<span class="kw">match</span>(/l+/g)',q:'?',a:["['ll']","['l','l']",'null','"ll"'],c:0},
+  {cat:'REGEX',code:'/^[a-z]+$/.<span class="kw">test</span>(<span class="str">"ABC"</span>)',q:'?',a:['false','true','null','"ABC"'],c:0},
+  {cat:'REGEX',code:'<span class="str">"abc123"</span>.<span class="kw">replace</span>(/\\d/g,<span class="str">"#"</span>)',q:'?',a:['"abc###"','"abc#"','"###123"','"abc123"'],c:0},
+  {cat:'REGEX',code:'/^[A-Z]\\w{2,}$/.<span class="kw">test</span>(<span class="str">"Cat"</span>)',q:'?',a:['true','false','null','"Cat"'],c:0},
+  {cat:'REGEX',code:'<span class="str">"a-b-c"</span>.<span class="kw">split</span>(/-/).length',q:'?',a:['3','2','4','1'],c:0},
+  {cat:'CSS',code:'<span class="com">/* CSS */</span>\n:nth-child(2n+<span class="num">1</span>)',q:'?',a:['Impari (1,3,5)','Pari (2,4,6)','Primul','Toate'],c:0},
+  {cat:'CSS',code:'#id .class vs .a.b.c',q:'Specificity?',a:['#id .class','.a.b.c','Egale','Ordinea decide'],c:0},
+  {cat:'CSS',code:'<span class="com">/* z-index */</span>\nposition: static; z-index: 10',q:'Funcționează?',a:['Nu','Da','Doar Chrome','Greșit'],c:0},
+  {cat:'CSS',code:'display: flex;\njustify-content: center;\nalign-items: center;',q:'Aliniere?',a:['Centrat ambele','Stânga sus','Distribuit','Dreapta jos'],c:0},
+  {cat:'CSS',code:'!important inline\n vs\n!important stylesheet',q:'?',a:['Inline','Stylesheet','Egale','Niciuna'],c:0},
+  {cat:'ASYNC',code:'<span class="kw">await</span> <span class="kw">Promise</span>.all([])',q:'?',a:['[]','undefined','null','Error'],c:0},
+  {cat:'ASYNC',code:'<span class="kw">async</span> f(){<span class="kw">return</span> <span class="num">1</span>}\nf() <span class="com">// tip?</span>',q:'?',a:['Promise','Number','async','Function'],c:0},
+  {cat:'ASYNC',code:'<span class="kw">setTimeout</span>(()=&gt;log(<span class="num">1</span>),<span class="num">0</span>);\nlog(<span class="num">2</span>)',q:'Ordinea?',a:['2 apoi 1','1 apoi 2','Simultan','Doar 1'],c:0},
+  {cat:'ASYNC',code:'<span class="kw">Promise</span>.race([P1,P2])',q:'?',a:['Prima','Toate','Niciuna','Ultima'],c:0},
+  {cat:'ASYNC',code:'<span class="kw">try</span>{<span class="kw">await</span> reject(<span class="str">"x"</span>)}\n<span class="kw">catch</span>(e){log(e)}',q:'?',a:['"x"','undefined','Promise','Error'],c:0}
+];
+
+/* ---- 30 Achievements ---- */
+const ACHS=[
+  {id:'km1',i:'🛣',tr:'Primul kilometru',te:'First km'},{id:'km5',i:'🌌',tr:'5000m',te:'5000m'},{id:'km10',i:'🚀',tr:'10000m',te:'10000m'},
+  {id:'co5',i:'🔥',tr:'Combo ×5',te:'Combo ×5'},{id:'co10',i:'⚡',tr:'Combo ×10',te:'Combo ×10'},{id:'co20',i:'☄',tr:'Combo ×20',te:'Combo ×20'},
+  {id:'lds10',i:'💼',tr:'10 lead-uri',te:'10 leads'},{id:'lds50',i:'📊',tr:'50 lead-uri',te:'50 leads'},
+  {id:'hk3',i:'🧠',tr:'Hacker novice',te:'Hacker novice'},{id:'hk10',i:'🤖',tr:'Hacker pro',te:'Hacker pro'},
+  {id:'spd',i:'💨',tr:'Speedster',te:'Speedster'},
+  {id:'acq',i:'🎯',tr:'Acquisition tree',te:'Acquisition tree'},{id:'ret',i:'💚',tr:'Retention tree',te:'Retention tree'},
+  {id:'ops',i:'⚙',tr:'Operations tree',te:'Operations tree'},{id:'intel',i:'🔮',tr:'Intelligence tree',te:'Intelligence tree'},
+  {id:'all',i:'👑',tr:'Toate 16',te:'All 16'},
+  {id:'rk5',i:'🥉',tr:'Rang 5',te:'Rank 5'},{id:'rk10',i:'🥇',tr:'Rang 10',te:'Rank 10'},{id:'prst1',i:'⚛',tr:'Primul Prestige',te:'First Prestige'},
+  {id:'str3',i:'📅',tr:'Streak 3 zile',te:'3-day streak'},{id:'str7',i:'🗓',tr:'Streak 7 zile',te:'7-day streak'},
+  {id:'fr',i:'🤝',tr:'Aliat',te:'Ally'},{id:'fm',i:'👤',tr:'Loial',te:'Loyal'},{id:'fa',i:'🌐',tr:'Diplomat',te:'Diplomat'},
+  {id:'hz',i:'🔥',tr:'Hot Zone',te:'Hot Zone'},
+  {id:'d50',i:'💎',tr:'Colecționar',te:'Collector'},{id:'d500',i:'💠',tr:'Curator',te:'Curator'},
+  {id:'ch3',i:'📖',tr:'Capitol 3',te:'Chapter 3'},{id:'cha',i:'📚',tr:'Story complet',te:'Story complete'},
+  {id:'ds',i:'🎲',tr:'Daily Seed',te:'Daily Seed'}
+];
+
+/* ---- 12 Chapters ---- */
+const CHAP=[
+  {id:1,n_ro:'Boot Sequence',n_en:'Boot Sequence',f:'helix',d:1000},
+  {id:2,n_ro:'Primul Contact',n_en:'First Contact',f:'vyra',d:1500},
+  {id:3,n_ro:'Apel Financiar',n_en:'Financial Call',f:'aurum',d:2000},
+  {id:4,n_ro:'Bio-Sincron',n_en:'Bio-Sync',f:'omni',d:2500},
+  {id:5,n_ro:'Sigiliul de Acces',n_en:'Access Seal',f:'sigil',d:3000},
+  {id:6,n_ro:'Glitch în Coridor',n_en:'Glitch in Corridor',f:'null',d:3500},
+  {id:7,n_ro:'Alianță Falsă',n_en:'False Alliance',f:'helix',d:4000},
+  {id:8,n_ro:'Profilul Personal',n_en:'Personal Profile',f:'vyra',d:4500},
+  {id:9,n_ro:'Run pe Date',n_en:'Data Run',f:'aurum',d:5000},
+  {id:10,n_ro:'Tribunal Sintetic',n_en:'Synthetic Tribunal',f:'sigil',d:6000},
+  {id:11,n_ro:'Punctul Zero',n_en:'Point Zero',f:'null',d:7000},
+  {id:12,n_ro:'Ending',n_en:'Ending',f:null,d:8000}
+];
+
+/* ---- Story Beats (in-run dialogs) ---- */
+const BEATS={
+  helix:[{s:'HELIX·CORP',tx_ro:'Agent. Avem nevoie de viteză.',tx_en:'Agent. We need speed.',ch:[
+    {tr:'Acceptă',te:'Accept',e:{f:'helix',dl:10,m_ro:'+10 HELIX',m_en:'+10 HELIX'}},
+    {tr:'Refuză',te:'Refuse',e:{f:'helix',dl:-5,f2:'null',dl2:10,m_ro:'-5 HELIX, +10 NULL',m_en:'-5 HELIX, +10 NULL'}}]}],
+  vyra:[{s:'VYRA·NET',tx_ro:'Vreau profilul tău. 30 data shards.',tx_en:'I want your profile. 30 data shards.',ch:[
+    {tr:'Cedează (+15 VYRA)',te:'Surrender (+15 VYRA)',e:{f:'vyra',dl:15,dat:-30,m_ro:'+15 VYRA, -30 data',m_en:'+15 VYRA, -30 data'}},
+    {tr:'Refuză',te:'Refuse',e:{f:'vyra',dl:-10,f2:'sigil',dl2:10,m_ro:'-10 VYRA, +10 SIGIL',m_en:'-10 VYRA, +10 SIGIL'}}]}],
+  aurum:[{s:'AURUM·SYNDICATE',tx_ro:'Investește 500 CR într-un fond.',tx_en:'Invest 500 CR in a fund.',ch:[
+    {tr:'Investește',te:'Invest',e:{f:'aurum',dl:10,cr:-500,m_ro:'+10 AURUM, -500 CR',m_en:'+10 AURUM, -500 CR'}},
+    {tr:'Refuză',te:'Refuse',e:{f:'aurum',dl:-5,m_ro:'-5 AURUM',m_en:'-5 AURUM'}}]}],
+  omni:[{s:'OMNICELL',tx_ro:'Te repar. +1 viață acum.',tx_en:'I repair you. +1 life now.',ch:[
+    {tr:'Acceptă (+1 viață)',te:'Accept (+1 life)',e:{lf:1,f:'omni',dl:15,m_ro:'+1 viață, +15 OMNI',m_en:'+1 life, +15 OMNI'}},
+    {tr:'Refuză',te:'Refuse',e:{f:'omni',dl:-5,m_ro:'-5 OMNI',m_en:'-5 OMNI'}}]}],
+  sigil:[{s:'SIGIL·TRUST',tx_ro:'Confirmă identitatea pentru access premium.',tx_en:'Confirm identity for premium access.',ch:[
+    {tr:'Confirmă',te:'Confirm',e:{f:'sigil',dl:15,m_ro:'+15 SIGIL',m_en:'+15 SIGIL'}},
+    {tr:'Restă anonim',te:'Stay anonymous',e:{f:'sigil',dl:-10,f2:'null',dl2:15,m_ro:'-10 SIGIL, +15 NULL',m_en:'-10 SIGIL, +15 NULL'}}]}],
+  null:[{s:'NULL·COLLECTIVE',tx_ro:'Sabotăm checkpoint-ul. Ne ajuți?',tx_en:'We sabotage the checkpoint. Help us?',ch:[
+    {tr:'Ajută (skip check)',te:'Help (skip)',e:{f:'null',dl:15,sk:true,m_ro:'+15 NULL · skip',m_en:'+15 NULL · skip'}},
+    {tr:'Refuză',te:'Refuse',e:{f:'null',dl:-10,f2:'helix',dl2:10,m_ro:'-10 NULL, +10 HELIX',m_en:'-10 NULL, +10 HELIX'}}]}]
+};
+
+/* ---- 8 Prestige Nodes ---- */
+const PN=[
+  {id:'sc',n:'STARTING·CAPITAL',c:1,d_ro:'+500 CR la start',d_en:'+500 CR on start'},
+  {id:'sl',n:'EXTENDED·HEALTH',c:1,d_ro:'+1 viață la start',d_en:'+1 life on start'},
+  {id:'mb',n:'BASE·MULTIPLIER',c:2,d_ro:'Multiplier ×1.5',d_en:'Base mult ×1.5'},
+  {id:'db',n:'DATA·HARVEST',c:2,d_ro:'Data shards ×2',d_en:'Data shards ×2'},
+  {id:'fb',n:'DIPLOMATIC·CHANNEL',c:3,d_ro:'Rep changes ×1.5',d_en:'Rep ×1.5'},
+  {id:'xb',n:'XP·STREAM',c:3,d_ro:'XP gain ×2',d_en:'XP gain ×2'},
+  {id:'ua',n:'NEXUS·OVERRIDE',c:5,d_ro:'Toate modulele tier 1 free',d_en:'All tier 1 free'},
+  {id:'2c',n:'SECOND·CHANCE',c:5,d_ro:'O resurecție / run',d_en:'One revive / run'}
+];
+
+/* ---- Weather ---- */
+const WTHR=[
+  {id:'clear',n_ro:'CLAR',n_en:'CLEAR'},{id:'rain',n_ro:'PLOAIE NEON',n_en:'NEON RAIN'},
+  {id:'flare',n_ro:'ERUPȚIE SOLARĂ',n_en:'SOLAR FLARE'},{id:'fog',n_ro:'CEAȚĂ',n_en:'NIGHT FOG'},
+  {id:'storm',n_ro:'FURTUNĂ CUANTICĂ',n_en:'QUANTUM STORM'}
+];
+
+/* ---- Persistent state ---- */
+let unl=S.g('ach',{}),
+    fRep=S.g('fRep',{helix:0,vyra:0,aurum:0,omni:0,sigil:0,null:0}),
+    sProg=S.g('sProg',{}),
+    mOwn=S.g('mods',{}),
+    xp=S.g('xp',0),
+    prest=S.g('prest',0),
+    qcores=S.g('qc',0),
+    pNodes=S.g('pNodes',{}),
+    runs=S.g('runs',0),
+    tData=S.g('tData',0);
+
+function rank(){return Math.floor(Math.sqrt(xp/100))+1}
+function hasN(id){return !!pNodes[id]}
+function hasM(id){return !!mOwn[id]}
+
+function unlock(id){if(unl[id])return;unl[id]=true;S.s('ach',unl);const a=ACHS.find(x=>x.id===id);if(a)toast('🏆 '+(LANG==='ro'?a.tr:a.te),'y');A.mod()}
+
+function chRep(f,d){if(!FACS.find(x=>x.id===f))return;let r=d;if(hasN('fb'))r=Math.round(d*1.5);fRep[f]=Math.max(-100,Math.min(100,fRep[f]+r));S.s('fRep',fRep);updateFacBar();if(fRep[f]>=50)unlock('fr');if(fRep[f]>=100)unlock('fm');if(FACS.every(x=>fRep[x.id]>=50))unlock('fa')}
+
+function gainXP(n){const b=rank();if(hasN('xb'))n=Math.round(n*2);xp+=n;S.s('xp',xp);const a=rank();if(a>b){toast('⬆ '+t('t_rank')+' '+a,'c');A.rk();if(a>=5)unlock('rk5');if(a>=10){unlock('rk10');document.getElementById('b-doprest').disabled=false}}}
+
+function getDaily(){const d=new Date(),sd=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  const types=[{r:'Atinge 3000m',e:'Reach 3000m',rw:800,c:s=>s.distance>=3000},
+    {r:'Închide 20 lead-uri',e:'Close 20 leads',rw:1000,c:s=>s.leadsTotal>=20},
+    {r:'5 challenges corecte',e:'5 correct challenges',rw:1200,c:s=>s.chCorrect>=5},
+    {r:'Combo ×12',e:'Combo ×12',rw:1500,c:s=>s.bestCombo>=12},
+    {r:'Score 30000',e:'Score 30000',rw:2000,c:s=>s.score>=30000},
+    {r:'3 facțiuni rep +20',e:'3 factions rep +20',rw:1800,c:()=>Object.values(fRep).filter(x=>x>=20).length>=3}];
+  return{...types[sd%types.length],seed:sd}}
+
+function upDaily(){const d=getDaily();document.getElementById('db-t').textContent=LANG==='ro'?d.r:d.e;document.getElementById('db-r').textContent='+'+d.rw+' CR'}
+
+function chkStreak(){const td=new Date().toDateString(),st=S.g('streak',{last:null,c:0});if(st.last===td)return;const y=new Date();y.setDate(y.getDate()-1);if(st.last===y.toDateString())st.c++;else st.c=1;st.last=td;S.s('streak',st);if(st.c>=3)unlock('str3');if(st.c>=7)unlock('str7')}
+
+function toast(m,ty=''){const el=document.createElement('div');el.className='toast '+ty;el.textContent=m;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),3000)}
+
+/* ============================================================
+   GAME ENGINE
+   ============================================================ */
+const cv=document.getElementById('game'),ctx=cv.getContext('2d');
+let W=0,H=0;
+function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);W=r.width;H=r.height}
+window.addEventListener('resize',resize);
+
+const G={
+  st:'menu',md:'free',sCh:null,
+  lns:[0.25,0.5,0.75],
+  car:{ln:1,x:0,y:0,tx:0,w:36,h:56,lives:3,inv:0,bst:0},
+  speed:4,bSp:4,mSp:16,
+  distance:0,score:0,leads:0,leadsTotal:0,dataS:0,
+  credits:S.g('credits',0),
+  combo:1,bestCombo:1,coT:0,mult:1,mT:0,
+  heat:0,hotZ:false,
+  obs:[],pks:[],pts:[],rain:[],
+  mods:mOwn,
+  chk:1,chCorrect:0,bstCount:0,
+  lstO:0,lstP:0,
+  pCRM:false,frSolv:false,scrY:0,
+  weather:'clear',skipCh:false,beats:{},vendT:false,
+  ai:{cr:0,pk:0,la:0,d:0.5},usedR:false
+};
+
+function spawnO(){let ln=rngI(0,2);let ty=rng()<(0.6+G.ai.d*0.2)?'block':'spike';G.obs.push({ty,ln,x:G.lns[ln]*W,y:-60,w:50,h:60});if(G.hotZ&&rng()<0.4){let l2=(ln+1+rngI(0,1))%3;G.obs.push({ty:'block',ln:l2,x:G.lns[l2]*W,y:-100,w:50,h:60})}}
+
+function spawnP(){const ln=rngI(0,2),r=rng();let ty;const dc=(G.weather==='rain'?0.18:0.05)*(hasM('analytics')?2:1);if(r<dc)ty='data';else if(r<0.65)ty='lead';else if(r<0.85)ty='energy';else ty='boost';G.pks.push({ty,ln,x:G.lns[ln]*W,y:-30,w:26,h:26,t:0})}
+
+function spawnPart(x,y,col,n=8){for(let i=0;i<n;i++)G.pts.push({x,y,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6-2,life:1,col,sz:2+Math.random()*3})}
+
+function spawnRain(){if(G.weather!=='rain')return;if(G.rain.length<60)G.rain.push({x:Math.random()*W,y:-10,sp:8+Math.random()*4})}
+
+function aiDir(dt){G.ai.la+=dt;if(G.ai.la<5)return;G.ai.la=0;if(G.ai.cr>=2)G.ai.d=Math.max(0,G.ai.d-0.15);else if(G.ai.pk>30)G.ai.d=Math.min(1,G.ai.d+0.1);G.ai.cr=0;G.ai.pk=0}
+
+let shX=0,shY=0,shT=0,shI=0;
+function shake(i,d){shI=i;shT=d}
+
+function update(dt){
+  if(G.st!=='running')return;
+  G.speed=Math.min(G.mSp,G.bSp+G.distance/500);
+  if(G.car.bst>0){G.speed*=1.7;G.car.bst-=dt}
+  if(G.hotZ)G.speed*=1.15;
+  G.distance+=G.speed*dt*6;G.scrY+=G.speed*dt*60;
+  G.heat=Math.min(100,G.heat+(G.car.inv>0?0:dt*4+G.combo*0.2));
+  if(G.heat>=100&&!G.hotZ){G.hotZ=true;toast('🔥 '+t('t_hot'),'r');A.b(220,.3,'sawtooth',1);unlock('hz')}
+  else if(G.heat<60&&G.hotZ)G.hotZ=false;
+  document.getElementById('h-hf').style.width=G.heat+'%';document.getElementById('h-h').textContent=Math.floor(G.heat);
+  let sg=G.speed*dt*6*G.mult;
+  if(G.weather==='fog')sg*=1.5;
+  if(G.hotZ)sg*=2;
+  if(hasN('mb'))sg*=1.5;
+  if(hasM('nexus'))sg*=1.25;
+  G.score+=Math.floor(sg);
+  G.car.tx=G.lns[G.car.ln]*W;G.car.x+=(G.car.tx-G.car.x)*0.18;G.car.y=H-110;
+  if(G.car.inv>0)G.car.inv-=dt;
+  if(G.coT>0){G.coT-=dt;if(G.coT<=0)G.combo=1}
+  if(G.mT>0){G.mT-=dt;if(G.mT<=0)G.mult=1}
+  aiDir(dt);
+  G.lstO+=dt;G.lstP+=dt;
+  const obR=Math.max(0.5,1.4-G.distance/8000)*(1-G.ai.d*0.3);
+  if(G.lstO>obR){spawnO();G.lstO=0}
+  if(G.lstP>0.7){spawnP();G.lstP=0}
+  if(G.weather==='rain')spawnRain();
+  const mv=G.speed*60;
+  G.obs.forEach(o=>o.y+=mv*dt);G.obs=G.obs.filter(o=>o.y<H+80);
+  const mag=hasM('booking')||hasM('inbound');
+  G.pks.forEach(p=>{p.y+=mv*dt;p.t+=dt;if(mag&&(p.ty==='lead'||(hasM('inbound')&&p.ty!=='data'))){const d=Math.abs(p.y-G.car.y);if(d<200)p.x+=(G.car.x-p.x)*0.06}});
+  G.pks=G.pks.filter(p=>p.y<H+30);
+  G.rain.forEach(r=>r.y+=r.sp);G.rain=G.rain.filter(r=>r.y<H+10);
+  G.pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life-=dt*1.5});G.pts=G.pts.filter(p=>p.life>0);
+  const cx=G.car.x,cy=G.car.y,cw=G.car.w,ch=G.car.h;
+  G.obs.forEach((o,i)=>{if(Math.abs(o.x-cx)<(cw+o.w)/2-8&&Math.abs(o.y-cy)<(ch+o.h)/2-8){if(G.car.inv<=0){hitO();G.obs.splice(i,1)}}});
+  G.pks.forEach((p,i)=>{if(Math.abs(p.x-cx)<(cw+p.w)/2&&Math.abs(p.y-cy)<(ch+p.h)/2){collP(p);G.pks.splice(i,1)}});
+  if(G.distance>=G.chk*1000){G.chk++;if(G.skipCh){G.skipCh=false;toast(t('t_skip'),'v')}else trigCode()}
+  const bk=Math.floor(G.distance/700);
+  if(bk>0&&!G.beats[bk]&&G.md!=='story'&&rng()<0.4){G.beats[bk]=true;trigBeat()}
+  if(G.distance>=1500&&!G.vendT&&rng()<0.6){G.vendT=true;trigVend()}
+  if(G.leadsTotal>0&&G.leadsTotal%10===0&&!G.pCRM&&G.leads>=10){G.pCRM=true;G.leads=0;setTimeout(openCRM,200)}
+  if(G.distance>=1000)unlock('km1');
+  if(G.distance>=5000)unlock('km5');
+  if(G.distance>=10000)unlock('km10');
+  if(G.combo>=5)unlock('co5');if(G.combo>=10)unlock('co10');if(G.combo>=20)unlock('co20');
+  if(G.leadsTotal>=10)unlock('lds10');if(G.leadsTotal>=50)unlock('lds50');
+  if(G.chCorrect>=3)unlock('hk3');
+  ['acq','ret','ops','intel'].forEach(tr=>{if(MODS.filter(m=>m.tr===tr).every(m=>hasM(m.id)))unlock(tr)});
+  if(MODS.every(m=>hasM(m.id)))unlock('all');
+  if(G.md==='story'&&G.sCh)chkCh();
+  upHUD();
+}
+
+function hitO(){A.crash();G.car.inv=1.5;spawnPart(G.car.x,G.car.y,'#ff3b6b',20);shake(10,0.4);G.heat=Math.max(0,G.heat-30);G.ai.cr++;let l=1;if(hasM('autosave')&&rng()<0.5)l=0;G.car.lives-=l;if(!hasM('churn')){G.combo=1;G.coT=0}toast(t('t_crash'),'m');if(G.car.lives<=0){if(hasN('2c')&&!G.usedR){G.usedR=true;G.car.lives=2;G.car.inv=3;toast('⚛ SECOND CHANCE','v');A.mod()}else gameOver()}}
+
+function collP(p){G.ai.pk++;spawnPart(p.x,p.y,p.ty==='lead'?'#ff2bd6':p.ty==='energy'?'#00f0ff':p.ty==='data'?'#8a3bff':'#ffe600',12);
+  if(p.ty==='lead'){G.leads++;G.leadsTotal++;G.combo++;if(G.combo>G.bestCombo)G.bestCombo=G.combo;G.coT=3;if(hasM('pipeline'))G.combo++;
+    let cb=50*G.mult*G.combo;if(hasM('kanban'))cb*=1.1;if(hasM('billing'))cb*=1.25;if(hasM('lead_ai'))cb*=1.5;if(hasM('nexus'))cb*=1.25;if(G.hotZ)cb*=2;
+    G.credits+=Math.floor(cb);G.score+=Math.floor(100*G.mult*G.combo);
+    if(hasM('rbac'))G.car.inv=Math.max(G.car.inv,0.5);
+    A.lead();upCombo()}
+  else if(p.ty==='energy'){G.score+=200*G.mult;if(hasM('flow')){G.leads++;G.leadsTotal++}A.en2()}
+  else if(p.ty==='data'){let am=1;if(hasN('db'))am*=2;G.dataS+=am;tData+=am;S.s('tData',tData);A.dat();toast('💎 +'+am,'v');if(tData>=50)unlock('d50');if(tData>=500)unlock('d500')}
+  else{let d=5;if(hasM('quantum'))d*=2;if(G.weather==='flare')d*=1.5;G.car.bst=d;G.bstCount++;toast(t('t_boost'),'c');A.b(880,.2,'sawtooth',.8);if(G.bstCount>=5)unlock('spd')}}
+
+function upCombo(){const el=document.getElementById('combo');if(G.combo>1){document.getElementById('combo-n').textContent=G.combo;el.classList.add('on');el.classList.toggle('huge',G.combo>=10);clearTimeout(window._ct);window._ct=setTimeout(()=>el.classList.remove('on','huge'),800)}}
+
+function render(){
+  ctx.save();
+  if(shT>0){shX=(Math.random()-.5)*shI;shY=(Math.random()-.5)*shI;shT-=1/60;ctx.translate(shX,shY)}
+  ctx.fillStyle='#0a0f1f';ctx.fillRect(0,0,W,H);
+  const grd=ctx.createLinearGradient(0,0,0,H*0.6);
+  if(G.hotZ){grd.addColorStop(0,'rgba(40,15,15,1)');grd.addColorStop(0.7,'rgba(255,59,107,0.25)');grd.addColorStop(1,'rgba(255,140,26,0.35)')}
+  else{grd.addColorStop(0,'rgba(10,15,31,1)');grd.addColorStop(0.7,'rgba(138,59,255,0.18)');grd.addColorStop(1,'rgba(255,43,214,0.25)')}
+  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H*0.6);
+  ctx.save();
+  const sY=H*0.45,sR=Math.min(W,H)*0.12;
+  const sG=ctx.createRadialGradient(W/2,sY,0,W/2,sY,sR);
+  if(G.hotZ){sG.addColorStop(0,'rgba(255,140,26,.95)');sG.addColorStop(0.4,'rgba(255,59,107,.55)')}
+  else{sG.addColorStop(0,'rgba(255,230,0,.9)');sG.addColorStop(0.4,'rgba(255,43,214,.5)')}
+  sG.addColorStop(1,'rgba(138,59,255,0)');
+  ctx.fillStyle=sG;ctx.beginPath();ctx.arc(W/2,sY,sR*2,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<5;i++){ctx.fillStyle='rgba(10,15,31,1)';ctx.fillRect(W/2-sR,sY-sR+i*sR*0.5,sR*2,3)}
+  ctx.restore();
+  const hY=H*0.5;
+  ctx.strokeStyle=G.hotZ?'rgba(255,140,26,.3)':'rgba(0,240,255,.25)';ctx.lineWidth=1;
+  const gs=(G.scrY*0.3)%50;
+  ctx.beginPath();ctx.moveTo(0,hY);ctx.lineTo(W,hY);ctx.stroke();
+  for(let i=1;i<=10;i++){const z=i+(gs/50),y=hY+((H-hY)*(z*z/100));if(y>H)continue;const al=1-(z/10);ctx.strokeStyle=G.hotZ?`rgba(255,140,26,${0.4*al})`:`rgba(0,240,255,${0.4*al})`;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  ctx.strokeStyle=G.hotZ?'rgba(255,59,107,.4)':'rgba(255,43,214,.3)';
+  for(let i=-8;i<=8;i++){if(i===0)continue;ctx.beginPath();ctx.moveTo(W/2,hY);ctx.lineTo(W/2+i*W*0.13,H);ctx.stroke()}
+  ctx.fillStyle='rgba(10,5,20,.85)';
+  ctx.beginPath();ctx.moveTo(W*0.15,H);ctx.lineTo(W*0.4,hY);ctx.lineTo(W*0.6,hY);ctx.lineTo(W*0.85,H);ctx.closePath();ctx.fill();
+  ctx.save();ctx.strokeStyle=G.hotZ?'rgba(255,140,26,.8)':'rgba(0,240,255,.7)';ctx.lineWidth=2;ctx.shadowColor=G.hotZ?'#ff8c1a':'#00f0ff';ctx.shadowBlur=10;
+  for(let ln=1;ln<=2;ln++){const tx=W*0.4+(W*0.2)*(ln/3),bx=W*0.15+(W*0.7)*(ln/3),of=(G.scrY*1.5)%60;
+    for(let i=0;i<12;i++){const ts=(i/12)+(of/600),te=ts+0.04;if(te>1)continue;const x1=tx+(bx-tx)*ts,y1=hY+(H-hY)*ts,x2=tx+(bx-tx)*te,y2=hY+(H-hY)*te;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}}
+  ctx.restore();
+  ctx.save();ctx.strokeStyle=G.hotZ?'#ff3b6b':'#ff2bd6';ctx.shadowColor=G.hotZ?'#ff3b6b':'#ff2bd6';ctx.shadowBlur=14;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(W*0.4,hY);ctx.lineTo(W*0.15,H);ctx.moveTo(W*0.6,hY);ctx.lineTo(W*0.85,H);ctx.stroke();ctx.restore();
+  if(G.weather==='rain'){ctx.strokeStyle='rgba(0,240,255,.4)';ctx.lineWidth=1;G.rain.forEach(r=>{ctx.beginPath();ctx.moveTo(r.x,r.y);ctx.lineTo(r.x-2,r.y+12);ctx.stroke()})}
+  if(G.weather==='fog'){ctx.fillStyle='rgba(180,180,210,.4)';ctx.fillRect(0,0,W,H)}
+  // Obstacles
+  G.obs.forEach(o=>{ctx.save();if(o.ty==='block'){ctx.fillStyle='rgba(255,59,107,.85)';ctx.shadowColor='#ff3b6b';ctx.shadowBlur=18;ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);ctx.strokeStyle='#ff3b6b';ctx.lineWidth=2;ctx.strokeRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);ctx.fillStyle='rgba(255,255,255,.15)';for(let y=-o.h/2;y<o.h/2;y+=5)ctx.fillRect(o.x-o.w/2,o.y+y,o.w,2)}
+    else{ctx.fillStyle='rgba(255,230,0,.9)';ctx.shadowColor='#ffe600';ctx.shadowBlur=18;ctx.beginPath();ctx.moveTo(o.x,o.y-o.h/2);ctx.lineTo(o.x+o.w/2,o.y+o.h/2);ctx.lineTo(o.x-o.w/2,o.y+o.h/2);ctx.closePath();ctx.fill();ctx.strokeStyle='#ff2bd6';ctx.lineWidth=2;ctx.stroke()}ctx.restore()});
+  // Pickups
+  G.pks.forEach(p=>{ctx.save();const pu=Math.sin(p.t*8)*0.2+0.8;
+    if(p.ty==='lead'){ctx.fillStyle='#ff2bd6';ctx.shadowColor='#ff2bd6';ctx.shadowBlur=20*pu;ctx.beginPath();ctx.arc(p.x,p.y,p.w/2*pu,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 14px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowBlur=0;ctx.fillText('$',p.x,p.y)}
+    else if(p.ty==='energy'){ctx.fillStyle='#00f0ff';ctx.shadowColor='#00f0ff';ctx.shadowBlur=18*pu;ctx.beginPath();ctx.moveTo(p.x,p.y-p.h/2);ctx.lineTo(p.x+p.w/2,p.y);ctx.lineTo(p.x,p.y+p.h/2);ctx.lineTo(p.x-p.w/2,p.y);ctx.closePath();ctx.fill()}
+    else if(p.ty==='data'){ctx.fillStyle='#8a3bff';ctx.shadowColor='#8a3bff';ctx.shadowBlur=22*pu;ctx.beginPath();for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2+p.t*2,px=p.x+Math.cos(a)*p.w/2*pu,py=p.y+Math.sin(a)*p.h/2*pu;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.closePath();ctx.fill()}
+    else{ctx.fillStyle='#ffe600';ctx.shadowColor='#ffe600';ctx.shadowBlur=22*pu;ctx.beginPath();ctx.moveTo(p.x-4,p.y-p.h/2);ctx.lineTo(p.x+8,p.y-4);ctx.lineTo(p.x+2,p.y-2);ctx.lineTo(p.x+8,p.y+p.h/2);ctx.lineTo(p.x-6,p.y+4);ctx.lineTo(p.x,p.y+2);ctx.closePath();ctx.fill()}
+    ctx.restore()});
+  // Car
+  ctx.save();
+  const x=G.car.x,y=G.car.y,cw=G.car.w,ch=G.car.h;
+  if(G.car.inv>0&&Math.floor(G.car.inv*10)%2)ctx.globalAlpha=0.4;
+  if(G.car.bst>0){for(let i=0;i<6;i++){ctx.save();ctx.globalAlpha=0.3-i*0.04;ctx.fillStyle='#ffe600';ctx.shadowColor='#ffe600';ctx.shadowBlur=20;ctx.fillRect(x-cw/2+4,y+ch/2+i*8,cw-8,6);ctx.restore()}}
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(x,y+ch/2+6,cw*0.55,4,0,0,Math.PI*2);ctx.fill();
+  ctx.shadowColor=G.hotZ?'#ff8c1a':'#00f0ff';ctx.shadowBlur=24;
+  const gr=ctx.createLinearGradient(x-cw/2,y,x+cw/2,y);gr.addColorStop(0,'#0a0f1f');gr.addColorStop(0.5,'#1a2456');gr.addColorStop(1,'#0a0f1f');
+  ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(x,y-ch/2);ctx.lineTo(x+cw/2,y-ch/4);ctx.lineTo(x+cw/2-4,y+ch/2);ctx.lineTo(x-cw/2+4,y+ch/2);ctx.lineTo(x-cw/2,y-ch/4);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=G.hotZ?'#ff8c1a':'#00f0ff';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(255,43,214,.35)';ctx.shadowBlur=8;ctx.beginPath();ctx.moveTo(x-cw/3,y-ch/6);ctx.lineTo(x+cw/3,y-ch/6);ctx.lineTo(x+cw/4,y+ch/8);ctx.lineTo(x-cw/4,y+ch/8);ctx.closePath();ctx.fill();
+  ctx.shadowBlur=16;ctx.fillStyle='#fff';ctx.fillRect(x-cw/2+4,y-ch/2+4,6,4);ctx.fillRect(x+cw/2-10,y-ch/2+4,6,4);
+  ctx.shadowColor='#ff3b6b';ctx.fillStyle='#ff3b6b';ctx.fillRect(x-cw/2+4,y+ch/2-6,cw-8,3);
+  ctx.restore();
+  // Particles
+  G.pts.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.shadowColor=p.col;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill();ctx.restore()});
+  // Lives
+  ctx.save();for(let i=0;i<G.car.lives;i++){ctx.fillStyle='#ff2bd6';ctx.shadowColor='#ff2bd6';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(20+i*22,H-24,7,0,Math.PI*2);ctx.fill()}ctx.restore();
+  // Weather label
+  if(G.weather!=='clear'){ctx.save();ctx.font='10px JetBrains Mono';ctx.textAlign='right';const w=WTHR.find(x=>x.id===G.weather);if(w){ctx.fillStyle='rgba(170,179,217,.6)';ctx.fillText('☁ '+w['n_'+LANG],W-20,H-16)}ctx.restore()}
+  ctx.restore();
+}
+
+function upHUD(){
+  document.getElementById('h-d').textContent=Math.floor(G.distance)+'M';
+  document.getElementById('h-s').textContent=Math.floor(G.speed*20);
+  document.getElementById('h-sc').textContent=G.score.toLocaleString();
+  document.getElementById('h-l').textContent=G.leadsTotal;
+  document.getElementById('h-c').textContent=Math.floor(G.credits);
+  document.getElementById('h-da').textContent=G.dataS;
+  document.getElementById('h-lf').style.width=((G.leads%10)*10)+'%';
+}
+
+let lastT=0;
+function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;update(dt);render();requestAnimationFrame(loop)}
+
+/* ---- Flow ---- */
+function startG(md='free'){A.init();hideAll();G.st='running';G.md=md;
+  G.distance=0;G.score=0;G.leads=0;G.leadsTotal=0;G.dataS=0;
+  G.combo=1;G.bestCombo=1;G.coT=0;G.mult=hasN('mb')?1.5:1;G.mT=0;
+  G.heat=0;G.hotZ=false;G.obs=[];G.pks=[];G.pts=[];G.rain=[];
+  G.chk=1;G.chCorrect=0;G.bstCount=0;
+  G.car.lives=hasN('sl')?4:3;G.car.ln=1;G.car.inv=0;G.car.bst=0;
+  G.pCRM=false;G.frSolv=hasM('ai_co');G.weather=WTHR[rngI(0,WTHR.length-1)].id;
+  G.skipCh=false;G.beats={};G.vendT=false;G.usedR=false;
+  G.ai={cr:0,pk:0,la:0,d:0.5};
+  if(hasN('sc'))G.credits+=500;
+  runs++;S.s('runs',runs);
+  if(md==='daily'){setSeed(getDaily().seed)}else setSeed(Date.now()%233280);
+  resize();upHUD();chkStreak();showObj();
+  if(G.weather!=='clear'){const w=WTHR.find(x=>x.id===G.weather);setTimeout(()=>toast('☁ '+w['n_'+LANG],'c'),400)}
+}
+
+function showObj(){const ol=document.getElementById('obj-list');let html='';
+  if(G.md==='story'&&G.sCh){const c=CHAP.find(x=>x.id===G.sCh);if(c)html=`<div class="oi">▸ ${LANG==='ro'?'Atinge':'Reach'} ${c.d}m</div>`}
+  else if(G.md==='daily'){const d=getDaily();html=`<div class="oi">▸ ${LANG==='ro'?d.r:d.e} (+${d.rw} CR)</div>`}
+  else html=`<div class="oi">▸ ${LANG==='ro'?'Run liber':'Free run'}</div>`;
+  ol.innerHTML=html;document.getElementById('obj').classList.add('on')}
+
+function pauseG(){if(G.st!=='running')return;G.st='paused';document.getElementById('p-d').textContent=Math.floor(G.distance)+'M';document.getElementById('p-s').textContent=G.score.toLocaleString();document.getElementById('p-c').textContent='×'+G.combo;show('ov-pause')}
+function resumeG(){if(G.st!=='paused')return;hideAll();G.st='running'}
+
+function openCRM(){G.st='crm';document.getElementById('cr-c').textContent=Math.floor(G.credits);document.getElementById('cr-l').textContent=G.leadsTotal;document.getElementById('cr-m').textContent=Object.keys(G.mods).length+'/16';renderM();show('ov-crm')}
+
+function renderM(){
+  ['acq','ret','ops','intel'].forEach(tr=>{const el=document.getElementById('tr-'+tr);el.innerHTML='';
+    MODS.filter(m=>m.tr===tr).forEach(m=>{
+      const ow=!!G.mods[m.id];
+      let cost=m.c;if(hasN('ua')&&m.t===1)cost=0;
+      const af=G.credits>=cost;
+      const tu=m.t===1||MODS.filter(o=>o.tr===tr&&o.t<m.t).every(o=>!!G.mods[o.id]);
+      const lk=!tu;
+      const d=document.createElement('div');d.className='md'+(ow?' ow':(lk||!af?' lk':''));
+      d.innerHTML=`<div class="mdt">T${m.t}</div><div class="mdn">${m.n}</div><div class="mdd">${m['d_'+LANG]}</div><div class="mdc">${cost} CR</div>`;
+      if(!ow&&!lk&&af){d.addEventListener('click',()=>{G.credits-=cost;G.mods[m.id]=true;mOwn=G.mods;S.s('mods',G.mods);A.mod();gainXP(50);toast(t('t_mod')+' · '+m.n,'c');renderM();document.getElementById('cr-c').textContent=Math.floor(G.credits);document.getElementById('cr-m').textContent=Object.keys(G.mods).length+'/16'})}
+      el.appendChild(d)})});
+}
+
+function contCRM(){hideAll();G.st='running';G.pCRM=false}
+
+function trigCode(){
+  G.st='code';
+  const c=CH[Math.floor(rng()*CH.length)];
+  document.getElementById('c-cat').textContent=c.cat;
+  document.getElementById('c-q').textContent=c.q;
+  document.getElementById('c-b').innerHTML=c.code;
+  const ae=document.getElementById('c-a');ae.innerHTML='';
+  const idx=c.a.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+  let resolved=false;
+  idx.forEach(o=>{const b=document.createElement('button');b.className='ab';b.textContent=c.a[o];b.addEventListener('click',()=>{if(resolved)return;resolved=true;clearInterval(tI);handleAns(o===c.c,b,idx,c.c)});ae.appendChild(b)});
+  if(G.frSolv){G.frSolv=false;setTimeout(()=>{if(resolved)return;resolved=true;clearInterval(tI);const cb=Array.from(ae.children)[idx.indexOf(c.c)];toast('🤖 AI COPILOT','c');handleAns(true,cb,idx,c.c)},1500)}
+  let tl=8;const tf=document.getElementById('c-t');tf.style.width='100%';
+  const tI=setInterval(()=>{tl-=0.1;tf.style.width=(tl/8*100)+'%';if(tl<=0&&!resolved){resolved=true;clearInterval(tI);handleAns(false,null,idx,c.c)}},100);
+  show('ov-code');
+}
+
+function handleAns(ok,btn,idx,ci){
+  const ae=document.getElementById('c-a');
+  Array.from(ae.children).forEach((b,i)=>{b.style.pointerEvents='none';if(idx[i]===ci)b.classList.add('cr')});
+  if(btn&&!ok)btn.classList.add('wr');
+  setTimeout(()=>{hideAll();G.st='running';
+    if(ok){G.mult=2;G.mT=15;G.credits+=300;G.score+=500;G.dataS+=50;G.chCorrect++;chRep('null',3);gainXP(30);
+      const tc=S.g('tCorrect',0)+1;S.s('tCorrect',tc);if(tc>=10)unlock('hk10');
+      toast(t('t_correct'),'y');A.ok()}
+    else{G.speed=Math.max(2,G.speed*0.5);G.bSp=Math.max(2,G.bSp*0.85);G.heat=Math.min(100,G.heat+20);setTimeout(()=>{G.bSp=4},3000);toast(t('t_wrong'),'m');A.no()}},1200);
+}
+
+function trigBeat(){const fIds=Object.keys(BEATS),fId=fIds[Math.floor(rng()*fIds.length)];const bs=BEATS[fId],b=bs[Math.floor(rng()*bs.length)];
+  document.getElementById('sd-sp').textContent='— '+b.s;document.getElementById('sd-tx').textContent=b['tx_'+LANG];
+  const ce=document.getElementById('sd-ch');ce.innerHTML='';
+  b.ch.forEach(c=>{const btn=document.createElement('button');btn.className='sch';btn.textContent=LANG==='ro'?c.tr:c.te;
+    btn.addEventListener('click',()=>{applyEff(c.e);hideSD()});ce.appendChild(btn)});
+  document.getElementById('story-d').classList.add('on');A.dlg();
+  setTimeout(()=>{if(document.getElementById('story-d').classList.contains('on'))hideSD()},12000)}
+
+function hideSD(){document.getElementById('story-d').classList.remove('on')}
+
+function applyEff(e){if(e.f&&e.dl)chRep(e.f,e.dl);if(e.f2&&e.dl2)chRep(e.f2,e.dl2);if(e.dat)G.dataS=Math.max(0,G.dataS+e.dat);if(e.cr)G.credits=Math.max(0,G.credits+e.cr);if(e.lf)G.car.lives+=e.lf;if(e.bst)G.car.bst+=e.bst;if(e.sk)G.skipCh=true;toast(e['m_'+LANG],'v')}
+
+function trigVend(){G.st='vendor';const f=FACS[Math.floor(rng()*FACS.length)],r=fRep[f.id]||0,al=r>=50;
+  document.getElementById('v-lbl').textContent='// VENDOR · '+f.n+' · REP '+r;
+  const vt=document.getElementById('v-t');vt.textContent=f.n;vt.style.color=f.hex;
+  document.getElementById('v-g').textContent=al?(LANG==='ro'?'Aliat! Prețuri reduse.':'Ally! Discounted.'):(r>=0?(LANG==='ro'?'Neutru.':'Neutral.'):(LANG==='ro'?'Ostil. Prețuri umflate.':'Hostile. Inflated.'));
+  const its=[{n_ro:'Boost instant',n_en:'Instant boost',c:300,e:()=>G.car.bst+=5},
+    {n_ro:'Refill viață',n_en:'Refill life',c:500,e:()=>G.car.lives=Math.min(5,G.car.lives+1)},
+    {n_ro:'Combo seed ×3',n_en:'Combo seed ×3',c:400,e:()=>{G.combo=Math.max(G.combo,3);G.coT=10}},
+    {n_ro:'Reset Heat',n_en:'Reset Heat',c:200,e:()=>{G.heat=0;G.hotZ=false}}];
+  const mul=al?0.7:(r<0?1.4:1);
+  const ie=document.getElementById('v-it');ie.innerHTML='';
+  its.forEach(it=>{const cost=Math.floor(it.c*mul),af=G.credits>=cost;
+    const d=document.createElement('div');d.className='md'+(!af?' lk':'');
+    d.innerHTML=`<div class="mdn">${it['n_'+LANG]}</div><div class="mdc">${cost} CR</div>`;
+    if(af)d.addEventListener('click',()=>{G.credits-=cost;it.e();A.mod();toast('✓ '+it['n_'+LANG],'c');leaveV()});
+    ie.appendChild(d)});
+  show('ov-vend');toast('🛒 '+t('t_vendor'),'c')}
+
+function leaveV(){hideAll();G.st='running'}
+
+function chkCh(){const c=CHAP.find(x=>x.id===G.sCh);if(!c)return;if(G.distance>=c.d&&!sProg[c.id]){sProg[c.id]=true;S.s('sProg',sProg);toast('📖 '+t('t_ch')+' '+c.id,'v');G.credits+=1000;gainXP(150);if(c.id>=3)unlock('ch3');if(Object.keys(sProg).length>=12)unlock('cha')}}
+
+function gameOver(){
+  G.st='gameover';document.getElementById('obj').classList.remove('on');
+  const d=getDaily(),td=new Date().toDateString(),ld=S.g('lastDaily',null);
+  if(ld!==td&&d.c(G)){G.credits+=d.rw;S.s('lastDaily',td);unlock('ds');toast('🎲 DAILY +'+d.rw+' CR','y')}
+  const xg=Math.floor(G.score/100);gainXP(xg);S.s('credits',G.credits);
+  const lb=S.g('lb',[]);lb.push({score:G.score,distance:Math.floor(G.distance),leads:G.leadsTotal,credits:Math.floor(G.credits),data:G.dataS,mode:G.md,date:new Date().toISOString()});
+  lb.sort((a,b)=>b.score-a.score);S.s('lb',lb.slice(0,20));
+  document.getElementById('e-d').textContent=Math.floor(G.distance)+'M';
+  document.getElementById('e-s').textContent=G.score.toLocaleString();
+  document.getElementById('e-l').textContent=G.leadsTotal;
+  document.getElementById('e-c').textContent=Math.floor(G.credits);
+  document.getElementById('e-ch').textContent=G.chCorrect;
+  document.getElementById('e-m').textContent=Object.keys(G.mods).length;
+  document.getElementById('e-da').textContent=G.dataS;
+  document.getElementById('e-x').textContent='+'+xg;
+  renderLB('e-lb',G.score);show('ov-end');
+}
+
+function renderLB(id,hs){const lb=S.g('lb',[]),el=document.getElementById(id);
+  if(lb.length===0){el.innerHTML='<div class="lbr"><span style="grid-column:1/-1;color:var(--t2);text-align:center">— '+(LANG==='ro'?'Niciun run salvat':'No runs yet')+' —</span></div>';return}
+  el.innerHTML=lb.slice(0,10).map((r,i)=>{const y=r.score===hs&&i<5;let rc='';if(i===0)rc='g';else if(i===1)rc='s2';else if(i===2)rc='br';
+    return `<div class="lbr ${y?'you':''}"><span class="lr ${rc}">#${i+1}</span><span class="ln">${y?(LANG==='ro'?'TU':'YOU'):'AGENT-'+Math.floor(rng()*900+100)}</span><span class="ls">${r.score.toLocaleString()}</span><span style="color:var(--t2)">${r.distance}M</span><span style="color:var(--vt)">${r.mode||'free'}</span></div>`}).join('')}
+
+function updateFacBar(){const el=document.getElementById('fr-rows');
+  el.innerHTML=FACS.map(f=>{const r=fRep[f.id]||0,po=r>=0,fc=po?f.hex:'#ff3b6b',off=po?50:(50-Math.abs(r)/2);
+    return `<div class="fr"><div class="fd" style="background:${f.hex}"></div><span class="fn">${f.n.split('·')[0]}</span><div class="rb"><div class="rb0"></div><div class="rbf" style="background:${fc};width:${Math.abs(r)/2}%;margin-left:${off}%"></div></div><span style="color:${fc};font-size:9px;min-width:22px;text-align:right">${r>0?'+':''}${r}</span></div>`}).join('')}
+
+function renderFC(){const el=document.getElementById('f-cards');
+  el.innerHTML=FACS.map(f=>{const r=fRep[f.id]||0,fc=r>=0?f.hex:'#ff3b6b';
+    return `<div class="fc" style="border-left-color:${f.hex}"><div class="fci"><h4 style="color:${f.hex}">${f.n}</h4><p>${f['d_'+LANG]}</p></div><div class="frn" style="color:${fc}">${r>0?'+':''}${r}</div></div>`}).join('')}
+
+function renderACH(){const g=document.getElementById('a-grid'),uc=Object.keys(unl).length;
+  document.getElementById('a-prog').textContent=uc+' / '+ACHS.length;
+  g.innerHTML=ACHS.map(a=>{const u=!!unl[a.id];return `<div class="a ${u?'u':''}"><div class="ai">${u?a.i:'🔒'}</div><div style="font-weight:700;color:${u?'var(--yl)':'var(--t2)'}">${LANG==='ro'?a.tr:a.te}</div></div>`}).join('')}
+
+function renderCH(){const l=document.getElementById('ch-list');
+  l.innerHTML=CHAP.map(c=>{const cm=!!sProg[c.id],pd=c.id===1||!!sProg[c.id-1],lk=!pd&&!cm;
+    const fc=c.f?FACS.find(f=>f.id===c.f):null;
+    return `<div class="ch ${lk?'lk':''} ${cm?'cm':''}" data-id="${c.id}"><div class="chn">CH.${c.id}</div><div><div class="chnm">${c['n_'+LANG]}${fc?' · <span style="color:'+fc.hex+';font-size:10px">'+fc.n+'</span>':''}</div><div style="font-size:10px;color:var(--t2);margin-top:2px">${LANG==='ro'?'Atinge':'Reach'} ${c.d}m</div></div><div class="chs">${cm?'✓':(lk?'🔒':'▶')}</div></div>`}).join('');
+  l.querySelectorAll('.ch:not(.lk)').forEach(el=>el.addEventListener('click',()=>{G.sCh=parseInt(el.dataset.id);hideAll();startG('story')}))}
+
+function renderPR(){document.getElementById('pr-q').textContent=qcores;document.getElementById('pr-l').textContent=prest;document.getElementById('pr-r').textContent=rank();
+  document.getElementById('b-doprest').disabled=rank()<10;
+  const el=document.getElementById('pr-nodes');
+  el.innerHTML=PN.map(n=>{const ow=hasN(n.id),af=qcores>=n.c;
+    return `<div class="pn-n ${ow?'ow':(!af?'lk':'')}" data-id="${n.id}"><div class="mdn" style="color:var(--vt)">${n.n}</div><div class="mdd">${n['d_'+LANG]}</div><div class="mdc" style="color:${ow?'var(--gn)':(af?'var(--yl)':'var(--t2)')}">${ow?'✓ ACTIV':n.c+' QC'}</div></div>`}).join('');
+  el.querySelectorAll('.pn-n:not(.ow):not(.lk)').forEach(el=>el.addEventListener('click',()=>{const id=el.dataset.id,n=PN.find(x=>x.id===id);if(qcores>=n.c){qcores-=n.c;pNodes[id]=true;S.s('qc',qcores);S.s('pNodes',pNodes);A.mod();toast('⚛ '+n.n,'v');renderPR()}}))}
+
+function doPrest(){if(rank()<10)return;xp=0;G.credits=0;S.s('xp',0);S.s('credits',0);mOwn={};G.mods={};S.s('mods',{});prest++;qcores++;S.s('prest',prest);S.s('qc',qcores);unlock('prst1');A.rk();toast('⚛ PRESTIGE ' + prest,'v');hideAll();show('ov-start');updateAgent()}
+
+function updateAgent(){document.getElementById('ag-r').textContent=rank();document.getElementById('ag-x').textContent=xp;document.getElementById('ag-p').textContent=prest;document.getElementById('ag-q').textContent=qcores;document.getElementById('ag-rn').textContent=runs;document.getElementById('ag-c').textContent=Object.keys(sProg).length+'/12'}
+
+/* ---- Overlay helpers ---- */
+function hideAll(){document.querySelectorAll('.ovl').forEach(o=>o.classList.remove('on'))}
+function show(id){document.getElementById(id).classList.add('on')}
+
+/* ---- Input ---- */
+const keys={};
+document.addEventListener('keydown',e=>{keys[e.code]=true;
+  if(G.st==='running'){
+    if(e.code==='ArrowLeft'||e.code==='KeyA')G.car.ln=Math.max(0,G.car.ln-1);
+    if(e.code==='ArrowRight'||e.code==='KeyD')G.car.ln=Math.min(2,G.car.ln+1);
+    if(e.code==='Space'){e.preventDefault();if(G.car.bst<=0&&G.credits>=100){G.car.bst=hasM('quantum')?10:5;G.credits-=100;G.bstCount++;toast(t('t_boost'),'c');A.b(880,.2,'sawtooth',.8)}}
+    if(e.code==='KeyP'||e.code==='Escape')pauseG();
+    if(e.code==='KeyF')document.getElementById('faction-bar').classList.toggle('show');
+  }else if(G.st==='paused'&&(e.code==='KeyP'||e.code==='Escape'))resumeG();
+});
+
+let tsX=null;
+cv.addEventListener('touchstart',e=>{tsX=e.touches[0].clientX},{passive:true});
+cv.addEventListener('touchend',e=>{if(G.st!=='running'||tsX===null)return;const dx=e.changedTouches[0].clientX-tsX;if(dx<-30)G.car.ln=Math.max(0,G.car.ln-1);else if(dx>30)G.car.ln=Math.min(2,G.car.ln+1);tsX=null},{passive:true});
+
+document.getElementById('t-l').addEventListener('touchstart',e=>{e.preventDefault();if(G.st==='running')G.car.ln=Math.max(0,G.car.ln-1)},{passive:false});
+document.getElementById('t-r').addEventListener('touchstart',e=>{e.preventDefault();if(G.st==='running')G.car.ln=Math.min(2,G.car.ln+1)},{passive:false});
+if(window.matchMedia('(hover:none) and (pointer:coarse)').matches)document.getElementById('touch-ctrl').classList.add('show');
+
+/* ---- Wire ---- */
+document.getElementById('b-start').addEventListener('click',()=>{A.c();startG('free')});
+document.getElementById('b-story').addEventListener('click',()=>{A.c();renderCH();show('ov-story')});
+document.getElementById('b-daily').addEventListener('click',()=>{A.c();startG('daily')});
+document.getElementById('b-resume').addEventListener('click',()=>{A.c();resumeG()});
+document.getElementById('b-quit').addEventListener('click',()=>{A.c();gameOver()});
+document.getElementById('b-retry').addEventListener('click',()=>{A.c();startG('free')});
+document.getElementById('b-home').addEventListener('click',()=>{A.c();hideAll();G.st='menu';upDaily();updateAgent();show('ov-start')});
+document.getElementById('b-share').addEventListener('click',()=>{const tx=`${LANG==='ro'?'Run complet pe NEXUS PROTOCOL v2!':'Complete run on NEXUS PROTOCOL v2!'} 🚀\n${LANG==='ro'?'Scor':'Score'}: ${G.score.toLocaleString()} · ${Math.floor(G.distance)}M\nhttps://laurandreea10.github.io/nexus-protocol/`;if(navigator.share)navigator.share({text:tx}).catch(()=>{});else if(navigator.clipboard){navigator.clipboard.writeText(tx);toast(LANG==='ro'?'Copiat!':'Copied!','c')}});
+document.getElementById('b-crm').addEventListener('click',()=>{A.c();contCRM()});
+document.getElementById('b-lb').addEventListener('click',()=>{A.c();renderLB('m-lb',null);show('ov-lb')});
+document.getElementById('b-lbc').addEventListener('click',()=>{A.c();hideAll();show('ov-start')});
+document.getElementById('b-lbr').addEventListener('click',()=>{if(confirm(LANG==='ro'?'Resetează?':'Reset?')){S.s('lb',[]);renderLB('m-lb',null)}});
+document.getElementById('b-ach').addEventListener('click',()=>{A.c();renderACH();show('ov-ach')});
+document.getElementById('b-achc').addEventListener('click',()=>{A.c();hideAll();show('ov-start')});
+document.getElementById('b-storyc').addEventListener('click',()=>{A.c();hideAll();show('ov-start')});
+document.getElementById('b-prest').addEventListener('click',()=>{A.c();renderPR();show('ov-prest')});
+document.getElementById('b-doprest').addEventListener('click',()=>{A.c();doPrest()});
+document.getElementById('b-prestc').addEventListener('click',()=>{A.c();hideAll();show('ov-start')});
+document.getElementById('b-factmod').addEventListener('click',()=>{A.c();renderFC();show('ov-fact')});
+document.getElementById('b-factc').addEventListener('click',()=>{A.c();hideAll();show('ov-start')});
+document.getElementById('b-vendl').addEventListener('click',()=>{A.c();leaveV()});
+document.getElementById('b-pause').addEventListener('click',()=>{A.c();if(G.st==='running')pauseG();else if(G.st==='paused')resumeG()});
+document.getElementById('b-fac').addEventListener('click',()=>document.getElementById('faction-bar').classList.toggle('show'));
+document.getElementById('b-lang').addEventListener('click',()=>{LANG=LANG==='ro'?'en':'ro';localStorage.setItem('nx2.lang',LANG);applyI18n();upDaily();updateAgent()});
+document.getElementById('b-sound').addEventListener('click',()=>{A.init();A.tog()});
+
+document.querySelectorAll('.tb[data-tab]').forEach(tb=>{tb.addEventListener('click',()=>{document.querySelectorAll('.tb[data-tab]').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.tc:not(.grid)').forEach(c=>c.classList.remove('on'));tb.classList.add('on');document.getElementById('t-'+tb.dataset.tab).classList.add('on')})});
+document.querySelectorAll('.tb[data-tree]').forEach(tb=>{tb.addEventListener('click',()=>{document.querySelectorAll('.tb[data-tree]').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.tc.grid').forEach(c=>c.classList.remove('on'));tb.classList.add('on');document.getElementById('tr-'+tb.dataset.tree).classList.add('on')})});
+
+/* ---- Init ---- */
+applyI18n();upDaily();chkStreak();updateAgent();updateFacBar();resize();
+if(!A.en)document.getElementById('b-sound').textContent='♪̸';
+requestAnimationFrame(loop);
+</script>
+</body></html>
